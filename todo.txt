@@ -1,0 +1,5 @@
+
+Some bug regarding packages showing version number -1 when they shouldn't
+Display orientation change (rotate) especially on the log view screen
+Send the log file to remote server (maybe via email?)
+General bug hunting / fixing
