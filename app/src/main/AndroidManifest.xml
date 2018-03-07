@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/> <!-- To save to log file -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/> <!-- To read IMEI number -->
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"

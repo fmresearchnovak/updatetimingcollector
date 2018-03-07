@@ -26,7 +26,7 @@ public class Main extends AppCompatActivity {
 
     public static final String TAG = "updatetimingcollector";
 
-    private static final String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE};
+    private static final String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.INTERNET};
 
 
     @Override
@@ -37,19 +37,21 @@ public class Main extends AppCompatActivity {
 
         // Get / Check all permissions first
         boolean needsPermissions = false;
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if(permissionCheck == PackageManager.PERMISSION_DENIED){
-            LogBcastReceiverOnOff(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
-            needsPermissions = true;
-        }
-
-        permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
-        if(permissionCheck == PackageManager.PERMISSION_DENIED){
-            LogBcastReceiverOnOff(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
-            needsPermissions = true;
+        String curPerm;
+        for(int i = 0; i < permissions.length; i++){
+            curPerm = permissions[i];
+            int permissionCheck = ContextCompat.checkSelfPermission(this, curPerm);
+            if(permissionCheck == PackageManager.PERMISSION_DENIED){
+                LogBcastReceiverOnOff(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
+                needsPermissions = true;
+            }
         }
 
         if(needsPermissions){
+            // I  request all (even those I already have)
+            // I hope it doesn't cause any problems.  Hopefully
+            // the system ignores requests for permissions that
+            // the app already has!
             ActivityCompat.requestPermissions(this, permissions, 0);
             return;
         }

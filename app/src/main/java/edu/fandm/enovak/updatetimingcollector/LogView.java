@@ -2,6 +2,10 @@ package edu.fandm.enovak.updatetimingcollector;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,6 +17,8 @@ import java.io.IOException;
 
 public class LogView extends AppCompatActivity {
 
+    private TextView mainTV;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,41 +29,49 @@ public class LogView extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
-        String contents = readLogFile();
-        TextView v = (TextView)findViewById(R.id.logview_tv_fileview);
-        v.setText(contents);
+
+        mainTV = (TextView)findViewById(R.id.logview_tv_fileview);
+
+        loadAndDisplayFile();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu m){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_logview, m);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.action_refresh) {
+            loadAndDisplayFile();
+            Log.d(Main.TAG, "Reloading...");
+        } else if (menuItem.getItemId() == R.id.action_upload) {
+            uploadFile();
+            Log.d(Main.TAG, "Uploading...");
+            Toast.makeText(this, "File Uploaded", Toast.LENGTH_SHORT).show();
+        }
+
+
+        return true;
     }
 
 
-    // Wow what a pain this method is!
-    // Reading files in Java is too complicated (there are so many choices!)
-    // and some choices (like the one I made below) are too complicated
-    private String readLogFile(){
+    private void uploadFile(){
         File f = Lib.getLogFile();
-        if(f.exists() && f.canRead()){
+        FilePOSTer fp = new FilePOSTer(f);
+        fp.post();
+    }
 
-            StringBuilder sb = new StringBuilder();
-            byte[] buffer = new byte[1024];
-            FileInputStream fis = null;
 
-            try{
-                fis = new FileInputStream(f);
-                int n;
-                while( (n = fis.read(buffer)) != -1) {
-                    sb.append(new String(buffer));
-                }
-                return sb.toString();
-
-            } catch (FileNotFoundException e1){
-                Toast.makeText(this, "No log (file not found)", Toast.LENGTH_SHORT).show();
-            } catch (IOException e2){
-                Toast.makeText(this, "Error reading log", Toast.LENGTH_SHORT).show();
-            }
-            return "Error";
-
+    private void loadAndDisplayFile(){
+        File f = Lib.getLogFile();
+        String contents = Lib.readFile(f);
+        if(contents != null) {
+            mainTV.setText(contents);
         } else {
-            Toast.makeText(this, "Log missing or cannot be read for permissions reasons!", Toast.LENGTH_SHORT).show();
-            return "Error";
+            mainTV.setText("Error reading log file!");
         }
     }
 

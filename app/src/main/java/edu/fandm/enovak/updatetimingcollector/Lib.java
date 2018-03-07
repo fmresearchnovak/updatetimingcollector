@@ -4,8 +4,11 @@ import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.style.TtsSpan;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -46,5 +49,39 @@ public class Lib {
         }
 
         return false;
+    }
+
+
+    // Wow what a pain this method is!
+    // Reading files in Java is too complicated (there are so many choices!)
+    // and some choices (like the one I made below) are too complicated
+    public static String readFile(File f){
+        if(f.exists() && f.canRead()){
+
+            StringBuilder sb = new StringBuilder();
+            byte[] buffer = new byte[1024];
+            FileInputStream fis = null;
+
+            try{
+                fis = new FileInputStream(f);
+                int n;
+                while( (n = fis.read(buffer)) != -1) {
+                    sb.append(new String(buffer));
+                }
+                return sb.toString();
+
+            } catch (FileNotFoundException e1){
+                Log.d(TAG, "No log (file not found)");
+                return null;
+            } catch (IOException e2){
+                Log.d(TAG, "Error reading log");
+                return null;
+            }
+
+
+        } else {
+            Log.d(TAG,"Log missing or cannot be read for permissions reasons!");
+            return null;
+        }
     }
 }
