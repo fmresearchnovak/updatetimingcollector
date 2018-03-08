@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="edu.fandm.enovak.updatetimingcollector.PermissionDetails">
+
+
+    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:shrinkColumns="2" >
+
+        <TableRow
+            android:background="#CCCCCC"
+            android:layout_margin="2dp">
+            <TextView
+                android:text="Name"
+                android:textStyle="bold"
+                android:padding="10dip"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:text="Android Description"
+                android:textStyle="bold"
+                android:padding="10dip"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:text="Actual Use"
+                android:textStyle="bold"
+                android:padding="10dip"
+                android:layout_gravity="center"/>
+        </TableRow>
+
+        <TableRow
+            android:background="#EFEFEF"
+            android:layout_margin="2dp">
+
+            <TextView
+                android:text="Phone"
+                android:textStyle="bold"
+                android:padding="10dip"
+                android:layout_gravity="center_vertical"/>
+
+            <TextView
+                android:text="make and manage phone calls"
+                android:padding="10dip"
+                android:layout_gravity="center_vertical"/>
+            <TextView
+                android:text="Access a unique identifier (IMEI number) for this device"
+                android:padding="10dip"
+                android:layout_gravity="center_vertical"/>
+        </TableRow>
+
+
+        <TableRow
+            android:background="#EFEFEF"
+            android:layout_margin="2dp" >
+
+            <TextView
+                android:text="Storage"
+                android:textStyle="bold"
+                android:padding="10dip"
+                android:layout_gravity="center_vertical"/>
+
+            <TextView
+                android:text="access photos, media, and files"
+                android:padding="10dip"
+                android:layout_gravity="center_vertical"/>
+            <TextView
+                android:text="Used to store the log on the phone"
+                android:padding="10dip"
+                android:layout_gravity="center_vertical"/>
+        </TableRow>
+<!--         <TableRow>
+            <TextView
+                android:text="Storage"
+                android:padding="3dip" />
+            <TextView
+                android:text="'access photos, media, and files''"
+                android:padding="3dip" />
+            <TextView
+                android:text="'Used to store the log on the phone'"
+                android:padding="3dip" />
+        </TableRow> -->
+    </TableLayout>
+
+
+</android.support.constraint.ConstraintLayout>

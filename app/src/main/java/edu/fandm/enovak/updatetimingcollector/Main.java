@@ -1,19 +1,19 @@
 package edu.fandm.enovak.updatetimingcollector;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -26,9 +26,10 @@ public class Main extends AppCompatActivity {
 
     public static final String TAG = "updatetimingcollector";
 
-    private static final String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.INTERNET};
 
+    private static final String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.INTERNET};
     private Context ctx;
+    private TextView statusTV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,46 +37,70 @@ public class Main extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ctx = getApplicationContext();
+        statusTV = (TextView)findViewById(R.id.main_tv_status);
 
-        // Get / Check all permissions first
-        boolean needsPermissions = false;
-        String curPerm;
-        for(int i = 0; i < permissions.length; i++){
-            curPerm = permissions[i];
-            int permissionCheck = ContextCompat.checkSelfPermission(ctx, curPerm);
-            if(permissionCheck == PackageManager.PERMISSION_DENIED){
-                LogBcastReceiverOnOff(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
-                needsPermissions = true;
-            }
-        }
-
-        if(needsPermissions){
+        boolean hasPerms = hasPermissions();
+        if(!hasPerms) {
             // I  request all (even those I already have)
-            // I hope it doesn't cause any problems.  Hopefully
-            // the system ignores requests for permissions that
+            // The system ignores requests for permissions that
             // the app already has!
             ActivityCompat.requestPermissions(this, permissions, 0);
-            return;
+
+        } else {
+
+            initializeLogFile();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        boolean hasPerms = hasPermissions();
+        if (hasPerms) {
+            // Create the log file, write the IMEI number, write the header row
+            LogBcastReceiverOnOff(PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
+            setStatusText(true);
+
+        } else {
+            LogBcastReceiverOnOff(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
+            setStatusText(false);
+        }
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu m){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, m);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        Intent i;
+        switch(menuItem.getItemId()) {
+            case R.id.view_log:
+                i = new Intent(ctx, LogView.class);
+                startActivity(i);
+                break;
+
+            case R.id.permissions_reprompt:
+                boolean hasPerms = hasPermissions();
+                if(hasPerms){
+                    Toast.makeText(ctx, "Permissions already granted", Toast.LENGTH_SHORT).show();
+                } else {
+                    ActivityCompat.requestPermissions(this, permissions, 0);
+                }
+                break;
+
+            case R.id.permissions_details:
+                i = new Intent(ctx, PermissionDetails.class);
+                startActivity(i);
         }
 
-        // Create the log file, write the IMEI number, write the header row
-        initializeLogFile();
-        LogBcastReceiverOnOff(PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
+        return true;
     }
-
-
-    public void launchLogViewActivity(View v){
-        Intent i = new Intent(this, LogView.class);
-        startActivity(i);
-    }
-
-
-    private void LogBcastReceiverOnOff(int newState){
-        PackageManager pm = getPackageManager();
-        ComponentName cn = new ComponentName(this, LogBcastReceiver.class);
-        pm.setComponentEnabledSetting(cn, newState, PackageManager.DONT_KILL_APP);
-    }
-
 
     public void onRequestPermissionsResult(int code, String permissions[], int[] grantResults){
         boolean missingOne = false;
@@ -86,11 +111,43 @@ public class Main extends AppCompatActivity {
         }
 
         if(missingOne){
-            Toast.makeText(this, "This application cannot function without all permissions.  Please restart the app and accept all requested permissions.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Background logging turned off", Toast.LENGTH_SHORT).show();
+
+            LogBcastReceiverOnOff(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
+            setStatusText(false);
+
         } else {
+
             initializeLogFile();
             LogBcastReceiverOnOff(PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
+            setStatusText(true);
         }
+    }
+
+
+    private boolean hasPermissions(){
+        // Get / Check all permissions first
+        boolean needsPermissions = false;
+        String curPerm;
+        for(int i = 0; i < permissions.length; i++){
+            curPerm = permissions[i];
+            int permissionCheck = ContextCompat.checkSelfPermission(ctx, curPerm);
+            if(permissionCheck == PackageManager.PERMISSION_DENIED){
+                needsPermissions = true;
+                break;
+            }
+        }
+        if(needsPermissions){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private void LogBcastReceiverOnOff(int newState){
+        PackageManager pm = getPackageManager();
+        ComponentName cn = new ComponentName(this, LogBcastReceiver.class);
+        pm.setComponentEnabledSetting(cn, newState, PackageManager.DONT_KILL_APP);
     }
 
 
@@ -108,6 +165,15 @@ public class Main extends AppCompatActivity {
             } catch (IOException e1){
                 Log.d(TAG, "Hand trouble intializing log file!");
             }
+        }
+    }
+
+
+    private void setStatusText(boolean isON){
+        if(isON){
+            statusTV.setText("Status: On");
+        } else {
+            statusTV.setText("Status: Off");
         }
     }
 

@@ -40,7 +40,7 @@ public class FilePOSTer {
         attachmentFileName = newF.getName();
         attachmentName = Lib.SHA256(newF.getName());
 
-        Log.d(TAG, "hash: " + attachmentName);
+        //Log.d(TAG, "hash: " + attachmentName);
     }
 
     // Asynchronous call that does the actual network communication
@@ -103,7 +103,9 @@ public class FilePOSTer {
                 responseStreamReader.close();
 
                 String response = sb.toString();
-                Log.d(TAG, "response: " + response);
+                if(response != "") {
+                    Log.d(TAG, "response: " + response);
+                }
 
                 httpURLConnection.disconnect();
 

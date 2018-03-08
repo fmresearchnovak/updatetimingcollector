@@ -22,3 +22,7 @@ timestamp,event,uid,name,version
 1520535373045,android.intent.action.PACKAGE_REPLACED,10106,edu.fandm.enovak.updatetimingcollector,1
 1520535665554,android.intent.action.PACKAGE_REMOVED,10106,edu.fandm.enovak.updatetimingcollector,1
 1520535665956,android.intent.action.PACKAGE_REPLACED,10106,edu.fandm.enovak.updatetimingcollector,1
+1520538757233,android.intent.action.PACKAGE_REMOVED,10106,edu.fandm.enovak.updatetimingcollector,1
+1520538758018,android.intent.action.PACKAGE_REPLACED,10106,edu.fandm.enovak.updatetimingcollector,1
+1520538870999,android.intent.action.PACKAGE_REMOVED,10106,edu.fandm.enovak.updatetimingcollector,1
+1520538871360,android.intent.action.PACKAGE_REPLACED,10106,edu.fandm.enovak.updatetimingcollector,1

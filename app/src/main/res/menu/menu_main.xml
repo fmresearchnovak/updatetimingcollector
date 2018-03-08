@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/view_log"
+        app:showAsAction="never"
+        android:title="View Log"/>
+
+    <item
+        android:id="@+id/permissions_details"
+        app:showAsAction="never"
+        android:title="Permission Details"/>
+
+    <item
+        android:id="@+id/permissions_reprompt"
+        app:showAsAction="never"
+        android:title="Permssion Prompt" />
+
+</menu>
+
