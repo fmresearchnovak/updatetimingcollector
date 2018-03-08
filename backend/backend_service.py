@@ -8,10 +8,16 @@
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import os
+import hashlib
 
 HOST_NAME = '155.68.60.102'
 PORT_NUMBER = 9000
 
+
+def sha256(data):
+    H = hashlib.sha256()
+    H.update(data.encode())
+    return H.digest().hex()
 
 class FileHandler(BaseHTTPRequestHandler):
     def do_HEAD(self):
@@ -25,23 +31,39 @@ class FileHandler(BaseHTTPRequestHandler):
 
 
     def do_POST(self):
-        print("DO_POST!!", self.path)
+        print()
+        print("New POST!!  at:", self.path)
 
         content_length = int(self.headers['content-length']) # size of data_file
         #post_data = self.rfile.read(content_length)
         post_data = self.rfile.read(content_length).decode("UTF-8")
+        #print("posted data:", repr(post_data))
 
-        #post_data = post_data.split()
-        print(repr(post_data))
+        name = post_data.split("\r\n")[1].split("=")[2].strip("\"")
+        #print("\nName: ", repr(name))
 
         file_contents = post_data.split("\r\n")[4].strip("-")
-        #print("file contents:", repr(file_contents))
+        #print("\nFile Contents:", repr(file_contents))
 
-        name =  post_data.split(";")[1].split("=")[1].strip("\"")
-        #print("Name: ", repr(name))
+        nameHashed =  post_data.split(";")[1].split("=")[1].strip("\"")
+        #print("\nName Hashed: ", repr(nameHashed))
 
-        self.writeFile(name, file_contents)
-        self.respond_ok()
+        computedHash = sha256(name)
+
+
+        print("Appears to be a valid file upload from a client...")
+        print("Name:", name, "  recieved hash:", repr(nameHashed), "  computed hash:", repr(computedHash))
+        #print(nameHashed)
+        #print(computedHash)
+
+        print("Verifying...")
+        if(nameHashed == computedHash):
+            print("\tVerified!")
+            print("\tWriting file...")
+            location = self.writeFile(name, file_contents)
+            print("\tWrote to: ", location)
+            self.respond_ok()
+
 
 
     def respond_ok(self):
@@ -50,9 +72,16 @@ class FileHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def writeFile(self, fileName, c):
-        fh = open(fileName, "w")
+        path = "./data/"
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        absPath = path + fileName
+        fh = open(absPath, "w")
         fh.write(c)
         fh.close()
+
+        return absPath
 
 
 

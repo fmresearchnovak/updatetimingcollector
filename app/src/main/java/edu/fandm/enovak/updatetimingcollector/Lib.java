@@ -1,5 +1,7 @@
 package edu.fandm.enovak.updatetimingcollector;
 
+import android.content.Context;
+import android.os.Build;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.style.TtsSpan;
@@ -11,6 +13,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 import static android.content.ContentValues.TAG;
 
@@ -20,16 +27,55 @@ import static android.content.ContentValues.TAG;
 
 public class Lib {
 
-    public static boolean isExternalStorageWritable(){
+    public static boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if(Environment.MEDIA_MOUNTED.equals(state)){
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
             return true;
         }
         return false;
     }
 
-    public static File getLogFile(){
-        File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "/update_log.csv");
+
+    public static String SHA256(String data) {
+        try { // The exception will never be thrown because I hard-coded the algorithm
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.reset();
+            byte[] hash = md.digest(data.getBytes("UTF-8"));
+
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < hash.length; i++){
+                sb.append(String.format("%02x", hash[i]));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e1) {
+            e1.printStackTrace();
+        } catch (UnsupportedEncodingException e2){
+            e2.printStackTrace();
+        }
+
+        // Should never happen!
+        return null;
+    }
+
+
+    public static String getIMEI(Context ctx){
+        TelephonyManager tManager = (TelephonyManager)ctx.getSystemService(Context.TELEPHONY_SERVICE);
+
+        try {
+            if (Build.VERSION.SDK_INT < 26) {
+                return tManager.getDeviceId();
+            } else if (Build.VERSION.SDK_INT >= 26) {
+                return tManager.getImei();
+            }
+        } catch (SecurityException e1){
+            Log.d(TAG, "Cannot obtain unique identify for permission / security reasons on this device");
+        }
+        return "0";
+    }
+
+    public static File getLogFile(Context ctx){
+        String fileName = getIMEI(ctx) + ".csv";
+        File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "/" + fileName);
         return f;
     }
 
@@ -66,7 +112,10 @@ public class Lib {
                 fis = new FileInputStream(f);
                 int n;
                 while( (n = fis.read(buffer)) != -1) {
-                    sb.append(new String(buffer));
+
+                    for(int i = 0; i < n; i++){
+                        sb.append((char)buffer[i]);
+                    }
                 }
                 return sb.toString();
 

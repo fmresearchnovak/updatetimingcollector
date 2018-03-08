@@ -59,14 +59,14 @@ public class LogView extends AppCompatActivity {
 
 
     private void uploadFile(){
-        File f = Lib.getLogFile();
+        File f = Lib.getLogFile(this);
         FilePOSTer fp = new FilePOSTer(f);
         fp.post();
     }
 
 
     private void loadAndDisplayFile(){
-        File f = Lib.getLogFile();
+        File f = Lib.getLogFile(this);
         String contents = Lib.readFile(f);
         if(contents != null) {
             mainTV.setText(contents);

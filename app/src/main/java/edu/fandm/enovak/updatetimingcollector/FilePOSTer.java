@@ -38,7 +38,9 @@ public class FilePOSTer {
         }
 
         attachmentFileName = newF.getName();
-        attachmentName = newF.getName();
+        attachmentName = Lib.SHA256(newF.getName());
+
+        Log.d(TAG, "hash: " + attachmentName);
     }
 
     // Asynchronous call that does the actual network communication

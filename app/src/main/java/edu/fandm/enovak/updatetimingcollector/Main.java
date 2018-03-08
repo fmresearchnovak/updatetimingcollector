@@ -28,19 +28,21 @@ public class Main extends AppCompatActivity {
 
     private static final String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.INTERNET};
 
+    private Context ctx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ctx = getApplicationContext();
 
         // Get / Check all permissions first
         boolean needsPermissions = false;
         String curPerm;
         for(int i = 0; i < permissions.length; i++){
             curPerm = permissions[i];
-            int permissionCheck = ContextCompat.checkSelfPermission(this, curPerm);
+            int permissionCheck = ContextCompat.checkSelfPermission(ctx, curPerm);
             if(permissionCheck == PackageManager.PERMISSION_DENIED){
                 LogBcastReceiverOnOff(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
                 needsPermissions = true;
@@ -94,13 +96,13 @@ public class Main extends AppCompatActivity {
 
 
     private void initializeLogFile(){
-        File logFile = Lib.getLogFile();
+        File logFile = Lib.getLogFile(ctx);
         if(!logFile.exists()){
             try{
                 logFile.createNewFile();
-                String IMEI = getIMEI() + "\n";
+                String IMEI = Lib.getIMEI(ctx) + "\n";
                 Log.d(TAG, "Writing to file   IMEI: " + IMEI);
-                writeFile(logFile, getIMEI() + "\n");
+                writeFile(logFile, IMEI + "\n");
                 writeFile(logFile,"timestamp,event,uid,name,version\n");
 
             } catch (IOException e1){
@@ -110,18 +112,5 @@ public class Main extends AppCompatActivity {
     }
 
 
-    private String getIMEI(){
-        TelephonyManager tManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 
-        try {
-            if (Build.VERSION.SDK_INT < 26) {
-                return tManager.getDeviceId();
-            } else if (Build.VERSION.SDK_INT >= 26) {
-                return tManager.getImei();
-            }
-        } catch (SecurityException e1){
-            Log.d(TAG, "Cannot obtain unique identify for permission / security reasons on this device");
-        }
-        return "0";
-    }
 }

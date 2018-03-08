@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <TextView android:id="@+id/logview_tv_fileview"
-            android:textScaleX="10sp"
+            android:textSize="12sp"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </ScrollView>

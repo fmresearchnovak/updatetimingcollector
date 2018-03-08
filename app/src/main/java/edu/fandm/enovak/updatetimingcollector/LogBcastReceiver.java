@@ -38,7 +38,7 @@ public class LogBcastReceiver extends BroadcastReceiver {
             case Intent.ACTION_PACKAGE_REMOVED:
                 if(Lib.isExternalStorageWritable()) {
 
-                    File logFile = Lib.getLogFile();
+                    File logFile = Lib.getLogFile(context);
                     if (logFile.exists() && logFile.canWrite()) {
                         int appUID = intent.getIntExtra(Intent.EXTRA_UID, -1);
                         PackageManager pm = context.getPackageManager();
