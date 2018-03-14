@@ -50,7 +50,7 @@ public class LogView extends AppCompatActivity {
         } else if (menuItem.getItemId() == R.id.action_upload) {
             uploadFile();
             Log.d(Main.TAG, "Uploading...");
-            Toast.makeText(this, "File Uploaded", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Uploading...", Toast.LENGTH_SHORT).show();
         }
 
 
@@ -69,10 +69,21 @@ public class LogView extends AppCompatActivity {
         File f = Lib.getLogFile(this);
         String contents = Lib.readFile(f);
         if(contents != null) {
+            mainTV.setText("loading...");
+
+            // Put in a phony delay for user satisfaction
+            try{
+                Thread.currentThread().sleep(1000); // one second
+            } catch (InterruptedException e1) {
+
+            }
+
             mainTV.setText(contents);
         } else {
             mainTV.setText("Error reading log file!");
         }
+
+
     }
 
 }

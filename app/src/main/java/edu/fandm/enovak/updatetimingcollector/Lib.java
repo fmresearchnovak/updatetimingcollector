@@ -133,4 +133,10 @@ public class Lib {
             return null;
         }
     }
+
+    public static void uploadFile(Context ctx){
+        File f = Lib.getLogFile(ctx);
+        FilePOSTer fp = new FilePOSTer(f);
+        fp.post();
+    }
 }

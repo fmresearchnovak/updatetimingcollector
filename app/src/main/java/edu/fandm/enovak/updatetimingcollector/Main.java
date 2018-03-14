@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -172,8 +173,10 @@ public class Main extends AppCompatActivity {
     private void setStatusText(boolean isON){
         if(isON){
             statusTV.setText("Status: On");
+            statusTV.setTextColor(Color.parseColor("#147e00"));
         } else {
             statusTV.setText("Status: Off");
+            statusTV.setTextColor(Color.parseColor("#000000"));
         }
     }
 

@@ -13,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+
 import static edu.fandm.enovak.updatetimingcollector.Main.TAG;
 
 /**
@@ -21,6 +22,9 @@ import static edu.fandm.enovak.updatetimingcollector.Main.TAG;
 
 public class FilePOSTer {
 
+
+
+    private final static String SERVER_ADDR = "http://updatetiming.ednovak.net:9000";
     public File f;
 
     private String attachmentName;
@@ -28,6 +32,9 @@ public class FilePOSTer {
     private final String newLine = "\r\n";
     private final String twoHyphens = "--";
     private final String boundary = "-----";
+
+
+
 
     private final String contents;
 
@@ -65,7 +72,7 @@ public class FilePOSTer {
             try {
 
                 // Setup request
-                url = new URL("http://155.68.60.102:9000");
+                url = new URL(SERVER_ADDR);
                 httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setUseCaches(false); // Maybe unnecessary
                 httpURLConnection.setDoOutput(true); // not sure what this does
@@ -108,6 +115,8 @@ public class FilePOSTer {
                 }
 
                 httpURLConnection.disconnect();
+
+                Log.d(TAG, "File uploaded successfully!");
 
             } catch (MalformedURLException e1){
                 e1.printStackTrace();
