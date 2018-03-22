@@ -2,9 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.fandm.enovak.updatetimingcollector">
 
+    <!-- These permissions require user approval -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- To save to log file -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- To read IMEI number -->
-    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- The below permissions are "protection_normal" which means we do not
+    have to prompt the user first before we use / have them -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- To upload the log file -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- To enable logging after a reboot -->
 
     <!-- To transmit log file to back end -->
     <application
@@ -38,7 +43,17 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".PermissionDetails"></activity>
+        <activity android:name=".PermissionDetails" />
+
+        <receiver
+            android:name=".BootBcastReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

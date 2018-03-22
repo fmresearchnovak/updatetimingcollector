@@ -148,7 +148,7 @@ public class LogBcastReceiver extends BroadcastReceiver {
                 // least 10 seconds after the last time the file was written thanks
                 // to the while loop above
                 uploadNecessary = false;
-                Log.d(TAG, "Thread in BcastReceiver will now upload.  Upload necessary: " + uploadNecessary);
+                Log.d(TAG, "Thread in BcastReceiver will now upload.  Upload necessary is now: " + uploadNecessary);
                 Lib.uploadFile(ctx);
             }
         }

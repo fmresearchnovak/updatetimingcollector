@@ -28,7 +28,6 @@ public class Main extends AppCompatActivity {
     public static final String TAG = "updatetimingcollector";
 
 
-    private static final String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.INTERNET};
     private Context ctx;
     private TextView statusTV;
 
@@ -40,12 +39,12 @@ public class Main extends AppCompatActivity {
         ctx = getApplicationContext();
         statusTV = (TextView)findViewById(R.id.main_tv_status);
 
-        boolean hasPerms = hasPermissions();
+        boolean hasPerms = Lib.hasPermissions(ctx);
         if(!hasPerms) {
             // I  request all (even those I already have)
             // The system ignores requests for permissions that
             // the app already has!
-            ActivityCompat.requestPermissions(this, permissions, 0);
+            ActivityCompat.requestPermissions(this, Lib.permissions, 0);
 
         } else {
 
@@ -57,14 +56,14 @@ public class Main extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
-        boolean hasPerms = hasPermissions();
+        boolean hasPerms = Lib.hasPermissions(ctx);
         if (hasPerms) {
             // Create the log file, write the IMEI number, write the header row
-            LogBcastReceiverOnOff(PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
+            Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
             setStatusText(true);
 
         } else {
-            LogBcastReceiverOnOff(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
+            Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
             setStatusText(false);
         }
     }
@@ -87,11 +86,11 @@ public class Main extends AppCompatActivity {
                 break;
 
             case R.id.permissions_reprompt:
-                boolean hasPerms = hasPermissions();
+                boolean hasPerms = Lib.hasPermissions(ctx);
                 if(hasPerms){
                     Toast.makeText(ctx, "Permissions already granted", Toast.LENGTH_SHORT).show();
                 } else {
-                    ActivityCompat.requestPermissions(this, permissions, 0);
+                    ActivityCompat.requestPermissions(this, Lib.permissions, 0);
                 }
                 break;
 
@@ -114,42 +113,19 @@ public class Main extends AppCompatActivity {
         if(missingOne){
             Toast.makeText(this, "Background logging turned off", Toast.LENGTH_SHORT).show();
 
-            LogBcastReceiverOnOff(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
+            Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
             setStatusText(false);
 
         } else {
 
             initializeLogFile();
-            LogBcastReceiverOnOff(PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
+            Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
             setStatusText(true);
         }
     }
 
 
-    private boolean hasPermissions(){
-        // Get / Check all permissions first
-        boolean needsPermissions = false;
-        String curPerm;
-        for(int i = 0; i < permissions.length; i++){
-            curPerm = permissions[i];
-            int permissionCheck = ContextCompat.checkSelfPermission(ctx, curPerm);
-            if(permissionCheck == PackageManager.PERMISSION_DENIED){
-                needsPermissions = true;
-                break;
-            }
-        }
-        if(needsPermissions){
-            return false;
-        } else {
-            return true;
-        }
-    }
 
-    private void LogBcastReceiverOnOff(int newState){
-        PackageManager pm = getPackageManager();
-        ComponentName cn = new ComponentName(this, LogBcastReceiver.class);
-        pm.setComponentEnabledSetting(cn, newState, PackageManager.DONT_KILL_APP);
-    }
 
 
 

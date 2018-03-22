@@ -24,7 +24,7 @@ public class FilePOSTer {
 
 
 
-    private final static String SERVER_ADDR = "http://updatetiming.ednovak.net:9000";
+    private final static String SERVER_ADDR = "http://cs-41.fandm.edu:9000";
     public File f;
 
     private String attachmentName;

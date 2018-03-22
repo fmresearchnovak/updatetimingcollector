@@ -69,15 +69,6 @@ public class LogView extends AppCompatActivity {
         File f = Lib.getLogFile(this);
         String contents = Lib.readFile(f);
         if(contents != null) {
-            mainTV.setText("loading...");
-
-            // Put in a phony delay for user satisfaction
-            try{
-                Thread.currentThread().sleep(1000); // one second
-            } catch (InterruptedException e1) {
-
-            }
-
             mainTV.setText(contents);
         } else {
             mainTV.setText("Error reading log file!");

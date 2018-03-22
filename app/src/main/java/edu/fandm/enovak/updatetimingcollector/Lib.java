@@ -1,8 +1,12 @@
 package edu.fandm.enovak.updatetimingcollector;
 
+import android.Manifest;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.style.TtsSpan;
 import android.util.Log;
@@ -26,6 +30,8 @@ import static android.content.ContentValues.TAG;
  */
 
 public class Lib {
+
+    public static final String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.INTERNET};
 
     public static boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
@@ -138,5 +144,31 @@ public class Lib {
         File f = Lib.getLogFile(ctx);
         FilePOSTer fp = new FilePOSTer(f);
         fp.post();
+    }
+
+    public static void LogBcastReceiverOnOff(Context ctx, int newState){
+        PackageManager pm = ctx.getPackageManager();
+        ComponentName cn = new ComponentName(ctx, LogBcastReceiver.class);
+        pm.setComponentEnabledSetting(cn, newState, PackageManager.DONT_KILL_APP);
+    }
+
+
+    public static boolean hasPermissions(Context ctx){
+        // Get / Check all permissions first
+        boolean needsPermissions = false;
+        String curPerm;
+        for(int i = 0; i < permissions.length; i++){
+            curPerm = permissions[i];
+            int permissionCheck = ContextCompat.checkSelfPermission(ctx, curPerm);
+            if(permissionCheck == PackageManager.PERMISSION_DENIED){
+                needsPermissions = true;
+                break;
+            }
+        }
+        if(needsPermissions){
+            return false;
+        } else {
+            return true;
+        }
     }
 }
