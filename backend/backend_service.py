@@ -12,6 +12,7 @@ import hashlib
 
 HOST_NAME = '155.68.60.102'
 PORT_NUMBER = 9000
+LOG_FILE_NAME = "logfile.txt"
 
 
 def sha256(data):
@@ -19,20 +20,44 @@ def sha256(data):
     H.update(data.encode())
     return H.digest().hex()
 
+
+def getFile(fileName):
+    path = "./data/"
+    if not os.path.exists(path):
+        os.makedirs(path)
+    absPath = path + fileName
+    return absPath
+
+def writeFile(fileName, c, codeLetter):
+    absPath = getFile(fileName)
+    fh = open(absPath, codeLetter)
+    fh.write(c)
+    fh.close()
+    return absPath
+
+
 class FileHandler(BaseHTTPRequestHandler):
+
+
+
     def do_HEAD(self):
-        print("DO_HEAD!!", self.path)
+        s = str(time.asctime()) + " HEAD!!  at" + str(self.path) + "\n"
+        writeFile(LOG_FILE_NAME, s, "a")
         self.respond_ok()
 
 
     def do_GET(self):
-        print("DO_GET!!", self.path)
+        s = str(time.asctime()) + " GET!!  at" + str(self.path) + "\n"
+        writeFile(LOG_FILE_NAME, s, "a")
         self.respond_ok()
 
 
     def do_POST(self):
-        print()
-        print("New POST!!  at:", self.path)
+        logFile = getFile(LOG_FILE_NAME)
+        logFH = open(logFile, 'a')
+
+        s = str(time.asctime()) + " POST!!  at:" + str(self.path) + "\n"
+        logFH.write(s)
 
         content_length = int(self.headers['content-length']) # size of data_file
         #post_data = self.rfile.read(content_length)
@@ -51,18 +76,33 @@ class FileHandler(BaseHTTPRequestHandler):
         computedHash = sha256(name)
 
 
-        print("Appears to be a valid file upload from a client...")
-        print("Name:", name, "  recieved hash:", repr(nameHashed), "  computed hash:", repr(computedHash))
+        s = "Appears to be a valid file upload from a client...\n"
+        logFH.write(s)
+        s = "Name:" + name + "  recieved hash:" + repr(nameHashed) + "  computed hash:" + repr(computedHash) + "\n"
+        logFH.write(s)
         #print(nameHashed)
         #print(computedHash)
 
-        print("Verifying...")
+        s = "Verifying...\n"
+        logFH.write(s)
         if(nameHashed == computedHash):
-            print("\tVerified!")
-            print("\tWriting file...")
-            location = self.writeFile(name, file_contents)
-            print("\tWrote to: ", location)
+            s = "\tVerified!\n"
+            logFH.write(s)
+
+            s = "\tWriting file...\n"
+            logFH.write(s)
+
+            location = writeFile(name, file_contents, 'w')
+            s = "\tWrote to: " + str(location) + "\n"
+            logFH.write(s)
+
             self.respond_ok()
+        else:
+            s = "Verification failed!!\n"
+            logFH.write(s)
+
+        logFH.write("\n")
+        logFH.close()
 
 
 
@@ -71,26 +111,20 @@ class FileHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/html')
         self.end_headers()
 
-    def writeFile(self, fileName, c):
-        path = "./data/"
-        if not os.path.exists(path):
-            os.makedirs(path)
 
-        absPath = path + fileName
-        fh = open(absPath, "w")
-        fh.write(c)
-        fh.close()
-
-        return absPath
 
 
 
 if __name__ == '__main__':
     httpd = HTTPServer((HOST_NAME, PORT_NUMBER), FileHandler)
-    print(time.asctime(), 'Server Starting - %s:%s' % (HOST_NAME, PORT_NUMBER))
+    s = str(time.asctime()) +  ' Server Starting - %s:%s' % (HOST_NAME, PORT_NUMBER) + "\n"
+    writeFile(LOG_FILE_NAME, s, 'a+')
+
     try:
+        print("Starting service...")
         httpd.serve_forever()
     except KeyboardInterrupt:
         pass
     httpd.server_close()
-    print(time.asctime(), 'Server Stopped - %s:%s' % (HOST_NAME, PORT_NUMBER))
+    s = time.asctime() + ' Server Stopped - %s:%s' % (HOST_NAME, PORT_NUMBER) + "\n"
+    writeFile(LOG_FILE_NAME, s, 'a')
