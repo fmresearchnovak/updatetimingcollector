@@ -1,5 +1,8 @@
 package edu.fandm.enovak.updatetimingcollector;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -48,6 +51,7 @@ public class LogView extends AppCompatActivity {
             loadAndDisplayFile();
             Log.d(Main.TAG, "Reloading...");
         } else if (menuItem.getItemId() == R.id.action_upload) {
+
             uploadFile();
             Log.d(Main.TAG, "Uploading...");
             Toast.makeText(this, "Uploading...", Toast.LENGTH_SHORT).show();
@@ -68,13 +72,13 @@ public class LogView extends AppCompatActivity {
     private void loadAndDisplayFile(){
         File f = Lib.getLogFile(this);
         String contents = Lib.readFile(f);
-        if(contents != null) {
-            mainTV.setText(contents);
+        if(contents == null){
+            mainTV.setText("Error reading log file.");
+        } else if(contents == ""){
+            mainTV.setText("Log File Empty!  Install / update some apps.");
         } else {
-            mainTV.setText("Error reading log file!");
+            mainTV.setText(contents);
         }
-
-
     }
 
 }

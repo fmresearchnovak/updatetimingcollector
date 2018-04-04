@@ -81,7 +81,21 @@ public class Lib {
 
     public static File getLogFile(Context ctx){
         String fileName = getIMEI(ctx) + ".csv";
-        File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "/" + fileName);
+
+        File envDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        if(!envDir.exists()){
+            envDir.mkdir();
+        }
+        File f = new File(envDir, "/" + fileName);
+        if(!f.exists()){
+            try{
+                f.createNewFile();
+            } catch (IOException e){
+                // This should not ever happen!
+                e.printStackTrace();
+                return null;
+            }
+        }
         return f;
     }
 

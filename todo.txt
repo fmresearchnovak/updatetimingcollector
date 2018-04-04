@@ -1,5 +1,9 @@
 
-Some bug regarding packages showing version number -1 when they shouldn't
-Display orientation change (rotate) especially on the log view screen
-Send the log file to remote server (maybe via email?)
+Some bug regarding packages showing version number -1 when they shouldn't and app names missing
+Check for usability after display orientation change (rotate) especially on the log view screen
 General bug hunting / fixing
+App Icon and upload to play store
+Prettier log presentation (raw log right now)
+Server confirmation (last upload time)
+File Upload when network connection not available
+

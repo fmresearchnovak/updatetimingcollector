@@ -10,6 +10,7 @@
     have to prompt the user first before we use / have them -->
     <uses-permission android:name="android.permission.INTERNET" /> <!-- To upload the log file -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- To enable logging after a reboot -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE " /> <!-- Check for connection before upload -->
 
     <!-- To transmit log file to back end -->
     <application
