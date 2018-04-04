@@ -25,7 +25,7 @@ import static edu.fandm.enovak.updatetimingcollector.Lib.writeFile;
 
 public class Main extends AppCompatActivity {
 
-    public static final String TAG = "updatetimingcollector";
+    public static final String TAG = "enovak.TAG";
 
 
     private Context ctx;

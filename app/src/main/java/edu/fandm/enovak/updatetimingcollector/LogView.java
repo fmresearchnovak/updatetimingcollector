@@ -49,23 +49,14 @@ public class LogView extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.action_refresh) {
             loadAndDisplayFile();
-            Log.d(Main.TAG, "Reloading...");
-        } else if (menuItem.getItemId() == R.id.action_upload) {
 
-            uploadFile();
-            Log.d(Main.TAG, "Uploading...");
-            Toast.makeText(this, "Uploading...", Toast.LENGTH_SHORT).show();
+        } else if (menuItem.getItemId() == R.id.action_upload) {
+            File f = Lib.getLogFile(this);
+            FilePOSTer fp = new FilePOSTer(f, this, true);
+            fp.execute();
         }
 
-
         return true;
-    }
-
-
-    private void uploadFile(){
-        File f = Lib.getLogFile(this);
-        FilePOSTer fp = new FilePOSTer(f);
-        fp.post();
     }
 
 

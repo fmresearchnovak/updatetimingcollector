@@ -53,6 +53,7 @@ public class LogBcastReceiver extends BroadcastReceiver {
                     File logFile = Lib.getLogFile(ctx);
                     if (logFile.exists() && logFile.canWrite()) {
                         int appUID = intent.getIntExtra(Intent.EXTRA_UID, -1);
+
                         PackageManager pm = ctx.getPackageManager();
                         String entry = genEntryString(pm, appUID, action);
                         writeFile(logFile, entry);
@@ -70,7 +71,17 @@ public class LogBcastReceiver extends BroadcastReceiver {
     }
 
     private String genEntryString(PackageManager pm, int uid, String action_type){
-
+        // This function uses the PackageManager to read a few values
+        //      The package name (reverse fqdn app name)
+        //      The version number (version code)
+        // These values may be null / void / -1 if the app was just removed
+        // However, the UID came from the Intent itself and is
+        // definitely always right.  When parsing the log file it should
+        // be trivial to figure out what app it was.  Just find another line with
+        // the same UID (maybe when this app was install or updated
+        // I would try to fix this so -1 and "null" never occure in the log
+        // file, but I think by the nature of the broadcast receiver it is
+        // unavoidable.
         String pkgName = pm.getNameForUid(uid);
         String entryStr = "";
 
@@ -149,7 +160,11 @@ public class LogBcastReceiver extends BroadcastReceiver {
                 // to the while loop above
                 uploadNecessary = false;
                 Log.d(TAG, "Thread in BcastReceiver will now upload.  Upload necessary is now: " + uploadNecessary);
-                Lib.uploadFile(ctx);
+
+
+                FilePOSTer fp = new FilePOSTer(Lib.getLogFile(ctx), ctx, false);
+                fp.execute();
+
             }
         }
     }

@@ -31,6 +31,8 @@ import static android.content.ContentValues.TAG;
 
 public class Lib {
 
+    public static final String PREF_FILE_NAME = "edu.fandm.enovak.updatetimingcollector.MAIN_PREF_FILE";
+    public static final String PREF_SERV_TS_KEY = "edu.fandm.enovak.updatetimingcollector.SERV_TS";
     public static final String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.INTERNET};
 
     public static boolean isExternalStorageWritable() {
@@ -152,12 +154,6 @@ public class Lib {
             Log.d(TAG,"Log missing or cannot be read for permissions reasons!");
             return null;
         }
-    }
-
-    public static void uploadFile(Context ctx){
-        File f = Lib.getLogFile(ctx);
-        FilePOSTer fp = new FilePOSTer(f);
-        fp.post();
     }
 
     public static void LogBcastReceiverOnOff(Context ctx, int newState){
