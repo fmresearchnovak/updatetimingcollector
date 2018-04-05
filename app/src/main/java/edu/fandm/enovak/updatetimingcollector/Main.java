@@ -148,7 +148,7 @@ public class Main extends AppCompatActivity {
 
     private void setStatusText(boolean isON){
         if(isON){
-            statusTV.setText("Status: On");
+            statusTV.setText("Status: Active");
             statusTV.setTextColor(Color.parseColor("#147e00"));
         } else {
             statusTV.setText("Status: Off");

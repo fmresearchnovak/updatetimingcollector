@@ -83,7 +83,7 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean result){
         String s = "";
         if(result){
-            s = "Success!";
+            s = "Log Uploaded!";
 
             // Save a timestamp, this will be displayed to user in the
             // "server information" activity

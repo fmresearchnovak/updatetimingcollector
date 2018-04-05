@@ -18,11 +18,23 @@
     <TextView android:id="@+id/main_tv_explain"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:text="The app keeps a log of application updates.  The only information it stores is the application name, the version, and the date each time an app is updated or installed.  You can view the log anytime!"
+        android:text="That's it, you're done!\n"
+        android:textSize="20sp"
+        android:textColor="#333333"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:textAlignment="center"/>
+
+    <TextView android:id="@+id/main_tv_explain_detail"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:text="The app keeps a log of your application updates for research purposes.  Each time you update or install an app, an entry to the log will be made containing that app's name, the version number, and the date.  Thank you for contributing to this project!"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/main_tv_explain"
         android:textAlignment="center"/>
 
     <TextView android:id="@+id/main_tv_status"
