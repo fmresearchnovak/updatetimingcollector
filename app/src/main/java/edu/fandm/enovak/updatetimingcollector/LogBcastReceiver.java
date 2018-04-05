@@ -36,13 +36,13 @@ public class LogBcastReceiver extends BroadcastReceiver {
         ctx = context;
 
         String action = intent.getAction();
-        Log.d(TAG, "Broadcast Received!!  intent: " + intent.toString() + "  action:" + action);
+        //Log.d(TAG, "Broadcast Received!!  intent: " + intent.toString() + "  action:" + action);
 
         switch(action){
 
 
             case Intent.ACTION_AIRPLANE_MODE_CHANGED:
-                Log.d(TAG, "Airplane Mode");
+                //Log.d(TAG, "Airplane Mode");
                 break;
 
             case Intent.ACTION_PACKAGE_REPLACED:
@@ -61,7 +61,7 @@ public class LogBcastReceiver extends BroadcastReceiver {
 
                     } else {
                         // Not sure what I should do here!
-                        Log.d(TAG, "Storage not write-able!");
+                        //Log.d(TAG, "Storage not write-able!");
                     }
                 }
                 break;
@@ -97,7 +97,7 @@ public class LogBcastReceiver extends BroadcastReceiver {
         }
 
         entryStr = System.currentTimeMillis() +"," + action_type + "," + uid + "," + pkgName + "," + version + "\n";
-        Log.d(TAG, entryStr);
+        //Log.d(TAG, entryStr);
         return entryStr;
     }
 
@@ -144,7 +144,7 @@ public class LogBcastReceiver extends BroadcastReceiver {
             }
 
             // Again, check if we should just die since we just waited a bit
-            Log.d(TAG, "Checking if upload necessary: " + uploadNecessary);
+            //Log.d(TAG, "Checking if upload necessary: " + uploadNecessary);
             if(uploadNecessary){
                 // There is a race condition here
                 // But I don't care for now.  The worst thing that happens is that the file is
@@ -159,7 +159,7 @@ public class LogBcastReceiver extends BroadcastReceiver {
                 // least 10 seconds after the last time the file was written thanks
                 // to the while loop above
                 uploadNecessary = false;
-                Log.d(TAG, "Thread in BcastReceiver will now upload.  Upload necessary is now: " + uploadNecessary);
+                //Log.d(TAG, "Thread in BcastReceiver will now upload.  Upload necessary is now: " + uploadNecessary);
 
 
                 FilePOSTer fp = new FilePOSTer(Lib.getLogFile(ctx), ctx, false);

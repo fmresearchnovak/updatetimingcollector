@@ -99,7 +99,7 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a");
             String dateString = formatter.format(new Date(ts));
 
-            Log.d(TAG, "Success uploading to server at: " + dateString);
+            //Log.d(TAG, "Success uploading to server at: " + dateString);
 
         } else {
             s = "Upload Failed!";
@@ -156,12 +156,12 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
 
             String response = sb.toString();
             if(response != "") {
-                Log.d(TAG, "response: " + response);
+                //Log.d(TAG, "response: " + response);
             }
 
             // Disconnect and return result
             httpURLConnection.disconnect();
-            Log.d(TAG, "File uploaded successfully!");
+            //Log.d(TAG, "File uploaded successfully!");
             return true;
 
         } catch (MalformedURLException e1){

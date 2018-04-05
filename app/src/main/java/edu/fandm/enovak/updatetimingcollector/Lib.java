@@ -76,7 +76,7 @@ public class Lib {
                 return tManager.getImei();
             }
         } catch (SecurityException e1){
-            Log.d(TAG, "Cannot obtain unique identify for permission / security reasons on this device");
+            //Log.d(TAG, "Cannot obtain unique identify for permission / security reasons on this device");
         }
         return "0";
     }
@@ -105,14 +105,14 @@ public class Lib {
         FileOutputStream fos = null;
         try{
             fos = new FileOutputStream(f, true);
-            Log.d(TAG, "Writing:" + entry + "   to file: " + f.getAbsolutePath());
+            //Log.d(TAG, "Writing:" + entry + "   to file: " + f.getAbsolutePath());
             fos.write(entry.getBytes());
             fos.close();
             return true;
 
         } catch (IOException e1) {
             // Error writing to file, not sure what I should do, giveup?
-            Log.d(TAG, "Cannot write to file! " + e1.getMessage());
+            //Log.d(TAG, "Cannot write to file! " + e1.getMessage());
             e1.printStackTrace();
         }
 
@@ -142,16 +142,16 @@ public class Lib {
                 return sb.toString();
 
             } catch (FileNotFoundException e1){
-                Log.d(TAG, "No log (file not found)");
+                //Log.d(TAG, "No log (file not found)");
                 return null;
             } catch (IOException e2){
-                Log.d(TAG, "Error reading log");
+                //Log.d(TAG, "Error reading log");
                 return null;
             }
 
 
         } else {
-            Log.d(TAG,"Log missing or cannot be read for permissions reasons!");
+            //Log.d(TAG,"Log missing or cannot be read for permissions reasons!");
             return null;
         }
     }

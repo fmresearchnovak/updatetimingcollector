@@ -135,12 +135,12 @@ public class Main extends AppCompatActivity {
             try{
                 logFile.createNewFile();
                 String IMEI = Lib.getIMEI(ctx) + "\n";
-                Log.d(TAG, "Writing to file   IMEI: " + IMEI);
+                //Log.d(TAG, "Writing to file   IMEI: " + IMEI);
                 writeFile(logFile, IMEI + "\n");
                 writeFile(logFile,"timestamp,event,uid,name,version\n");
 
             } catch (IOException e1){
-                Log.d(TAG, "Hand trouble intializing log file!");
+                //Log.d(TAG, "Hand trouble intializing log file!");
             }
         }
     }
