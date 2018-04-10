@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="edu.fandm.enovak.updatetimingcollector.StatusActivity">
+
+
+    <ImageView android:id="@+id/status_iv_chart"
+        android:layout_height="64dp"
+        android:layout_width="64dp"
+        android:src="@mipmap/chart"
+        android:layout_margin="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView android:id="@+id/status_tv_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Logging Status:"
+        android:textColor="#222222"
+        android:textSize="16sp"
+        android:layout_margin="20dp"
+        app:layout_constraintLeft_toRightOf="@+id/status_iv_chart"
+        app:layout_constraintBottom_toBottomOf="@id/status_iv_chart"/>
+
+    <TextView android:id="@+id/status_tv_status_val"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Inactive"
+        android:textColor="#bbbbbb"
+        android:textSize="16sp"
+        android:layout_marginLeft="20dp"
+        app:layout_constraintLeft_toRightOf="@+id/status_iv_chart"
+        app:layout_constraintTop_toBottomOf="@id/status_tv_status"/>
+
+
+    <ImageView android:id="@+id/status_iv_server"
+        android:layout_height="64dp"
+        android:layout_width="64dp"
+        android:src="@mipmap/computer_mainframe"
+        android:layout_margin="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/status_iv_chart"/>
+
+    <TextView android:id="@+id/status_tv_server_ts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Last Upload To Server:"
+        android:textColor="#222222"
+        android:textSize="16sp"
+        android:layout_margin="20dp"
+        app:layout_constraintLeft_toRightOf="@id/status_iv_server"
+        app:layout_constraintBottom_toBottomOf="@id/status_iv_server"/>
+
+    <TextView android:id="@+id/status_tv_server_ts_val"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0 Bytes"
+        android:textColor="#bbbbbb"
+        android:textSize="16sp"
+        android:layout_marginLeft="20dp"
+        app:layout_constraintLeft_toRightOf="@+id/status_iv_chart"
+        app:layout_constraintTop_toBottomOf="@id/status_tv_server_ts"/>
+
+    <ImageView android:id="@+id/status_iv_bytes"
+        android:layout_height="64dp"
+        android:layout_width="64dp"
+        android:src="@mipmap/line_contrib"
+        android:layout_margin="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/status_iv_server"/>
+
+    <TextView android:id="@+id/status_tv_bytes_contrib"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="You Have Contributed:"
+        android:textColor="#222222"
+        android:textSize="16sp"
+        android:layout_margin="20dp"
+        app:layout_constraintLeft_toRightOf="@id/status_iv_bytes"
+        app:layout_constraintBottom_toBottomOf="@id/status_iv_bytes"/>
+
+    <TextView android:id="@+id/status_tv_bytes_contrib_val"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0 Bytes"
+        android:textColor="#bbbbbb"
+        android:textSize="16sp"
+        android:layout_marginLeft="20dp"
+        app:layout_constraintLeft_toRightOf="@+id/status_iv_bytes"
+        app:layout_constraintTop_toBottomOf="@id/status_tv_bytes_contrib"/>
+
+</android.support.constraint.ConstraintLayout>

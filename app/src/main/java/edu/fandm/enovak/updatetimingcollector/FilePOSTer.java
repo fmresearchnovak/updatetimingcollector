@@ -86,8 +86,7 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
             s = "Log Uploaded!";
 
             // Save a timestamp, this will be displayed to user in the
-            // "server information" activity
-            // Which is not yet implemented!
+            // "status" activity
             long ts = System.currentTimeMillis();
             SharedPreferences sharedPref = ctx.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
             SharedPreferences.Editor e = sharedPref.edit();

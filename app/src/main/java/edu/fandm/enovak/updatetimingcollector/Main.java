@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +30,6 @@ public class Main extends AppCompatActivity {
 
 
     private Context ctx;
-    private TextView statusTV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +37,6 @@ public class Main extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ctx = getApplicationContext();
-        statusTV = (TextView)findViewById(R.id.main_tv_status);
 
         boolean hasPerms = Lib.hasPermissions(ctx);
         if(!hasPerms) {
@@ -56,16 +55,6 @@ public class Main extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
-        boolean hasPerms = Lib.hasPermissions(ctx);
-        if (hasPerms) {
-            // Create the log file, write the IMEI number, write the header row
-            Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
-            setStatusText(true);
-
-        } else {
-            Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
-            setStatusText(false);
-        }
     }
 
 
@@ -97,6 +86,12 @@ public class Main extends AppCompatActivity {
             case R.id.permissions_details:
                 i = new Intent(ctx, PermissionDetails.class);
                 startActivity(i);
+                break;
+
+            case R.id.view_status:
+                i = new Intent(ctx, StatusActivity.class);
+                startActivity(i);
+                break;
         }
 
         return true;
@@ -114,13 +109,11 @@ public class Main extends AppCompatActivity {
             Toast.makeText(this, "Background logging turned off", Toast.LENGTH_SHORT).show();
 
             Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
-            setStatusText(false);
 
         } else {
 
             initializeLogFile();
             Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
-            setStatusText(true);
         }
     }
 
@@ -144,18 +137,5 @@ public class Main extends AppCompatActivity {
             }
         }
     }
-
-
-    private void setStatusText(boolean isON){
-        if(isON){
-            statusTV.setText("Status: Active");
-            statusTV.setTextColor(Color.parseColor("#147e00"));
-        } else {
-            statusTV.setText("Status: Off");
-            statusTV.setTextColor(Color.parseColor("#000000"));
-        }
-    }
-
-
 
 }

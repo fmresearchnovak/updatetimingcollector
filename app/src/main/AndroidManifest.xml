@@ -6,12 +6,16 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- To save to log file -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- To read IMEI number -->
 
-    <!-- The below permissions are "protection_normal" which means we do not
-    have to prompt the user first before we use / have them -->
+
+    <!--
+    The below permissions are "protection_normal" which means we do not
+    have to prompt the user first before we use / have them
+    -->
     <uses-permission android:name="android.permission.INTERNET" /> <!-- To upload the log file -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- To enable logging after a reboot -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- Check for connection before upload -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- Check for connection before upload -->
     <!-- To transmit log file to back end -->
     <application
         android:allowBackup="true"
@@ -55,6 +59,7 @@
             </intent-filter>
         </receiver>
 
+        <activity android:name=".StatusActivity"></activity>
     </application>
 
 </manifest>
