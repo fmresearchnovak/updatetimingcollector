@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,8 @@ import java.util.Date;
 import static edu.fandm.enovak.updatetimingcollector.Lib.PREF_FILE_NAME;
 
 public class StatusActivity extends AppCompatActivity {
+
+
 
     private Context ctx;
 
@@ -32,19 +35,15 @@ public class StatusActivity extends AppCompatActivity {
     protected void onResume(){
         super.onResume();
 
+        // --- 1 ---
         // Logging status
-        boolean hasPerms = Lib.hasPermissions(ctx);
-        if (hasPerms) {
-            // Create the log file, write the IMEI number, write the header row
-            Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
+        boolean isLogging = Lib.LogBCastReceiverisOn(ctx);
+        if(isLogging && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             setStatusText(true);
-
-        } else {
-            Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
-            setStatusText(false);
         }
 
 
+        // --- 2 ---
         // Last upload to server
         // collect server ts from sharedPrefs
         SharedPreferences sharedPref = ctx.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
@@ -59,19 +58,19 @@ public class StatusActivity extends AppCompatActivity {
         }
 
 
+        // --- 3 ---
         // Number of Bytes
         File logF = Lib.getLogFile(ctx);
-        long bytes = logF.length();
-        Log.d(Main.TAG, "name: "+logF.getAbsoluteFile());
-        Log.d(Main.TAG, "bytes: "+bytes);
-        if(bytes != 0L){
-            TextView sizeTV = (TextView)findViewById(R.id.status_tv_bytes_contrib_val);
-            sizeTV.setText(bytes + " Bytes of data");
-            sizeTV.setTextColor(Color.parseColor("#147e00"));
+        if(logF != null) {
+            long bytes = logF.length();
+            Log.d(Main.TAG, "name: " + logF.getAbsoluteFile());
+            Log.d(Main.TAG, "bytes: " + bytes);
+            if (bytes != 0L) {
+                TextView sizeTV = (TextView) findViewById(R.id.status_tv_bytes_contrib_val);
+                sizeTV.setText(bytes + " Bytes of data");
+                sizeTV.setTextColor(Color.parseColor("#147e00"));
+            }
         }
-
-
-
     }
 
 

@@ -10,7 +10,7 @@
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:shrinkColumns="2" >
+        android:shrinkColumns="1,2" >
 
         <TableRow
             android:background="#CCCCCC"
@@ -48,9 +48,11 @@
                 android:text="make and manage phone calls"
                 android:padding="10dip"
                 android:layout_gravity="center_vertical"/>
+            
             <TextView
                 android:text="Access a unique identifier (IMEI number) for this device"
                 android:padding="10dip"
+                android:layout_width="1dp"
                 android:layout_gravity="center_vertical"/>
         </TableRow>
 
@@ -74,17 +76,7 @@
                 android:padding="10dip"
                 android:layout_gravity="center_vertical"/>
         </TableRow>
-<!--         <TableRow>
-            <TextView
-                android:text="Storage"
-                android:padding="3dip" />
-            <TextView
-                android:text="'access photos, media, and files''"
-                android:padding="3dip" />
-            <TextView
-                android:text="'Used to store the log on the phone'"
-                android:padding="3dip" />
-        </TableRow> -->
+
     </TableLayout>
 
 

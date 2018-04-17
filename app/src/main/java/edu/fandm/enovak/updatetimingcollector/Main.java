@@ -1,12 +1,16 @@
 package edu.fandm.enovak.updatetimingcollector;
 
 import android.Manifest;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -25,10 +29,14 @@ import static edu.fandm.enovak.updatetimingcollector.Lib.writeFile;
 
 
 public class Main extends AppCompatActivity {
-
     public static final String TAG = "enovak.TAG";
 
+    public static final int ISSUE_NONE = 0;
+    public static final int ISSUE_ANDROID_8 = 1;
+    public static final int ISSUE_PERMS = 2;
+    public static final int ISSUE_UNKNOWN = 100;
 
+    private TextView tv;
     private Context ctx;
 
     @Override
@@ -37,6 +45,7 @@ public class Main extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ctx = getApplicationContext();
+        tv = (TextView)findViewById(R.id.main_tv_explain);
 
         boolean hasPerms = Lib.hasPermissions(ctx);
         if(!hasPerms) {
@@ -48,13 +57,38 @@ public class Main extends AppCompatActivity {
         } else {
 
             initializeLogFile();
+            Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
         }
     }
+
 
     @Override
     public void onResume() {
         super.onResume();
 
+
+        int issue = getIssue();
+        switch(issue){
+            case ISSUE_ANDROID_8:
+                tv.setText("Android 8 not supported");
+                tv.setTextColor(Color.parseColor("#800000"));
+                break;
+
+            case ISSUE_PERMS:
+                tv.setText("Please accept all permissions");
+                tv.setTextColor(Color.parseColor("#800000"));
+                break;
+
+            case ISSUE_UNKNOWN:
+                tv.setText("Oops!  Something went wrong!");
+                tv.setTextColor(Color.parseColor("#800000"));
+                break;
+
+            case ISSUE_NONE:
+                tv.setText("That's it!  You're done!");
+                tv.setTextColor(Color.parseColor("#111111"));
+                break;
+        }
     }
 
 
@@ -64,6 +98,7 @@ public class Main extends AppCompatActivity {
         inflater.inflate(R.menu.menu_main, m);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
@@ -97,6 +132,7 @@ public class Main extends AppCompatActivity {
         return true;
     }
 
+
     public void onRequestPermissionsResult(int code, String permissions[], int[] grantResults){
         boolean missingOne = false;
         for(int i = 0; i < grantResults.length; i++){
@@ -107,19 +143,13 @@ public class Main extends AppCompatActivity {
 
         if(missingOne){
             Toast.makeText(this, "Background logging turned off", Toast.LENGTH_SHORT).show();
-
             Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
 
         } else {
-
             initializeLogFile();
             Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
         }
     }
-
-
-
-
 
 
     private void initializeLogFile(){
@@ -138,4 +168,21 @@ public class Main extends AppCompatActivity {
         }
     }
 
+
+    public int getIssue(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            //Log.d(TAG, "This is an oreo device!!");
+            return ISSUE_ANDROID_8;
+        }
+
+        if(!Lib.hasPermissions(ctx)){
+            return ISSUE_PERMS;
+        }
+
+        if(!Lib.LogBCastReceiverisOn(ctx)){
+            return ISSUE_UNKNOWN;
+        }
+
+        return ISSUE_NONE;
+    }
 }

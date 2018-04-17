@@ -3,6 +3,8 @@ package edu.fandm.enovak.updatetimingcollector;
 import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
@@ -18,12 +20,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.LongBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
-import static android.content.ContentValues.TAG;
+import static edu.fandm.enovak.updatetimingcollector.Main.TAG;
 
 /**
  * Created by enovak on 3/1/18.
@@ -34,6 +37,9 @@ public class Lib {
     public static final String PREF_FILE_NAME = "edu.fandm.enovak.updatetimingcollector.MAIN_PREF_FILE";
     public static final String PREF_SERV_TS_KEY = "edu.fandm.enovak.updatetimingcollector.SERV_TS";
     public static final String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.INTERNET};
+
+
+    private static PackageManager packageManager;
 
     public static boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
@@ -156,10 +162,27 @@ public class Lib {
         }
     }
 
+
+
     public static void LogBcastReceiverOnOff(Context ctx, int newState){
-        PackageManager pm = ctx.getPackageManager();
+        if(packageManager == null){
+            packageManager = ctx.getPackageManager();
+        }
         ComponentName cn = new ComponentName(ctx, LogBcastReceiver.class);
-        pm.setComponentEnabledSetting(cn, newState, PackageManager.DONT_KILL_APP);
+        packageManager.setComponentEnabledSetting(cn, newState, PackageManager.DONT_KILL_APP);
+    }
+
+    public static boolean LogBCastReceiverisOn(Context ctx){
+        Log.d(TAG, "CALLED!!");
+        if(packageManager == null){
+            packageManager = ctx.getPackageManager();
+        }
+        packageManager = ctx.getPackageManager();
+        ComponentName cn = new ComponentName(ctx, LogBcastReceiver.class);
+        //pm.setComponentEnabledSetting(cn, newState, PackageManager.DONT_KILL_APP);
+        int state = packageManager.getComponentEnabledSetting(cn);
+        Log.d(TAG, "state: " + state);
+        return packageManager.getComponentEnabledSetting(cn) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
     }
 
 

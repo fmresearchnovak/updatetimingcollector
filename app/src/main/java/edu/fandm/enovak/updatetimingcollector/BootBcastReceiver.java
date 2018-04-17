@@ -2,6 +2,7 @@ package edu.fandm.enovak.updatetimingcollector;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,9 +23,11 @@ public class BootBcastReceiver extends BroadcastReceiver {
         ctx = context;
 
         String action = intent.getAction();
+        Log.d(ContentValues.TAG, "BOOT Broadcast Received!!  intent: " + intent.toString() + "  action:" + action);
 
         if(action == Intent.ACTION_BOOT_COMPLETED){
 
+            // Check for necessary permissions and enable the BcastReceiver to log updates
             boolean hasPerms = Lib.hasPermissions(ctx);
             if (hasPerms) {
                 // Create the log file, write the IMEI number, write the header row
@@ -35,7 +38,6 @@ public class BootBcastReceiver extends BroadcastReceiver {
                 Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
                 //Log.d(TAG, "FAILED, unable to turn on the logging bcast receiver!!");
             }
-
         }
     }
 }

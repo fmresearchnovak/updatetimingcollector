@@ -36,13 +36,13 @@ public class LogBcastReceiver extends BroadcastReceiver {
         ctx = context;
 
         String action = intent.getAction();
-        //Log.d(TAG, "Broadcast Received!!  intent: " + intent.toString() + "  action:" + action);
+        Log.d(TAG, "Broadcast Received!!  intent: " + intent.toString() + "  action:" + action);
 
         switch(action){
 
 
             case Intent.ACTION_AIRPLANE_MODE_CHANGED:
-                //Log.d(TAG, "Airplane Mode");
+                Log.d(TAG, "Airplane Mode");
                 break;
 
             case Intent.ACTION_PACKAGE_REPLACED:
