@@ -51,7 +51,7 @@ public class LogBcastReceiver extends BroadcastReceiver {
                 if(Lib.isExternalStorageWritable()) {
 
                     File logFile = Lib.getLogFile(ctx);
-                    if (logFile.exists() && logFile.canWrite()) {
+                    if (logFile != null && logFile.exists() && logFile.canWrite()) {
                         int appUID = intent.getIntExtra(Intent.EXTRA_UID, -1);
 
                         PackageManager pm = ctx.getPackageManager();

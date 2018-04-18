@@ -13,7 +13,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toTopOf="@id/main_tv_explain"
-        android:src="@drawable/banner" />
+        android:src="@mipmap/banner" />
 
     <TextView android:id="@+id/main_tv_explain"
         android:layout_width="300dp"
