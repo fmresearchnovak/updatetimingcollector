@@ -10,7 +10,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import os
 import hashlib
 
-HOST_NAME = '155.68.60.102'
+HOST_NAME = '155.68.120.41'
 PORT_NUMBER = 9000
 LOG_FILE_NAME = "logfile.txt"
 
