@@ -87,6 +87,8 @@ def main():
 	fName = "availability/" + str(currentTimeMillis()) + ".csv"
 	print("fName:", fName)
 	outF = open(fName, 'w')
+	os.chmod(fName, 0777)
+	os.chown(fname, 1001, 1001)
 
 	for n in names:
 		print("App Name:", n)
