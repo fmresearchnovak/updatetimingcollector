@@ -6,7 +6,8 @@ import subprocess
 from subprocess import PIPE
 import time
 import datetime
-
+import sys
+import stat
 
 # Author: Prof. Novak
 # Description: This script uses a companion ruby script
@@ -23,6 +24,10 @@ import datetime
 # This script is designed to be run once daily (probably using cron)
 
 
+ALL_777 = stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | \
+stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP | \
+stat.S_IROTH | stat.S_IWOTH | stat.S_IXOTH
+
 def currentTimeMillis():
 	# Get the current time (local to this machine) in ms (unix time in ms)
 	# This is used to name the output  ".csv" file
@@ -38,7 +43,9 @@ def dateStringToUnixTS(dateString):
 
 def main():
 
-	os.chdir('/srv/update-timing-collector-backend/data/')
+	# Change to directory given (if any given)
+	if len(sys.argv) == 2:
+		os.chdir(sys.argv[1])
 
 	# Lookup all of the CSV files in this directory.
 	# This is meant to be run in the data/ directory (see line above)
@@ -87,6 +94,8 @@ def main():
 	fName = "availability/" + str(currentTimeMillis()) + ".csv"
 	print("fName:", fName)
 	outF = open(fName, 'w')
+	os.chmod(fName, ALL_777) # change perms cause this will be run by cron
+	#os.chown(fName, 1001, 1001) #this is "enovak" user on the server
 
 	for n in names:
 		print("App Name:", n)
