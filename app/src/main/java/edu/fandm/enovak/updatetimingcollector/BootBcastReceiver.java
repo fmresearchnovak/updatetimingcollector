@@ -29,15 +29,7 @@ public class BootBcastReceiver extends BroadcastReceiver {
 
             // Check for necessary permissions and enable the BcastReceiver to log updates
             boolean hasPerms = Lib.hasPermissions(ctx);
-            if (hasPerms) {
-                // Create the log file, write the IMEI number, write the header row
-                Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
-                //Log.d(TAG, "Enabled the logging bcast receiver!!");
-
-            } else {
-                Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
-                //Log.d(TAG, "FAILED, unable to turn on the logging bcast receiver!!");
-            }
+            Lib.LoggingOnOff(ctx, hasPerms); // If we have permissions, turn it on!
         }
     }
 }

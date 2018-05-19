@@ -25,14 +25,13 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
 
-import static edu.fandm.enovak.updatetimingcollector.Lib.writeFile;
+
 
 
 public class Main extends AppCompatActivity {
     public static final String TAG = "enovak.TAG";
 
     public static final int ISSUE_NONE = 0;
-    public static final int ISSUE_ANDROID_8 = 1;
     public static final int ISSUE_PERMS = 2;
     public static final int ISSUE_UNKNOWN = 100;
 
@@ -55,10 +54,12 @@ public class Main extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, Lib.permissions, 0);
 
         } else {
-
-            initializeLogFile();
-            Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
+            File logFile = Lib.getLogFile(ctx); // To initialize log file
+            Log.d(TAG, logFile.getAbsolutePath());
+            Lib.LoggingOnOff(ctx, true);
         }
+
+
     }
 
 
@@ -69,10 +70,6 @@ public class Main extends AppCompatActivity {
 
         int issue = getIssue();
         switch(issue){
-            case ISSUE_ANDROID_8:
-                tv.setText("Android 8 not supported");
-                tv.setTextColor(Color.parseColor("#800000"));
-                break;
 
             case ISSUE_PERMS:
                 tv.setText("Please accept all permissions");
@@ -143,37 +140,19 @@ public class Main extends AppCompatActivity {
 
         if(missingOne){
             Toast.makeText(this, "Background logging turned off", Toast.LENGTH_SHORT).show();
-            Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
+
+
+            Lib.LoggingOnOff(ctx, false);
 
         } else {
-            initializeLogFile();
-            Lib.LogBcastReceiverOnOff(ctx, PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
+            File logFile = Lib.getLogFile(ctx); // To initialize log file
+            Lib.LoggingOnOff(ctx, true);
         }
     }
 
-
-    private void initializeLogFile(){
-        File logFile = Lib.getLogFile(ctx);
-        if(!logFile.exists()){
-            try{
-                logFile.createNewFile();
-                String IMEI = Lib.getIMEI(ctx) + "\n";
-                //Log.d(TAG, "Writing to file   IMEI: " + IMEI);
-                writeFile(logFile, IMEI + "\n");
-                writeFile(logFile,"timestamp,event,uid,name,version\n");
-
-            } catch (IOException e1){
-                //Log.d(TAG, "Hand trouble intializing log file!");
-            }
-        }
-    }
 
 
     public int getIssue(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            //Log.d(TAG, "This is an oreo device!!");
-            return ISSUE_ANDROID_8;
-        }
 
         if(!Lib.hasPermissions(ctx)){
             return ISSUE_PERMS;

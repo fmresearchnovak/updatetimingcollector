@@ -1,6 +1,8 @@
 package edu.fandm.enovak.updatetimingcollector;
 
 import android.Manifest;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.HashMap;
 
 import static edu.fandm.enovak.updatetimingcollector.Main.TAG;
 
@@ -164,12 +167,37 @@ public class Lib {
 
 
 
-    public static void LogBcastReceiverOnOff(Context ctx, int newState){
-        if(packageManager == null){
-            packageManager = ctx.getPackageManager();
+    public static void LoggingOnOff(Context ctx, boolean newState){
+        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+            if(packageManager == null){
+                packageManager = ctx.getPackageManager();
+            }
+            ComponentName cn = new ComponentName(ctx, LogBcastReceiver.class);
+
+            int codedState;
+            if(newState){
+                codedState = PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+            } else {
+                codedState = PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+            }
+
+            packageManager.setComponentEnabledSetting(cn, codedState, PackageManager.DONT_KILL_APP);
+
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            JobScheduler js = (JobScheduler) ctx.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            if(newState) {
+                ComponentName cn = new ComponentName(ctx, LoggingJobSchedulerService.class);
+                JobInfo.Builder b = new JobInfo.Builder(1, cn);
+                //b.setPeriodic(7200000); // 2hrs = 7.2M milliseconds
+                b.setPeriodic(2000); // 2 seconds = 2000 milliseconds
+                int res = js.schedule(b.build());
+                if (res < 0) {
+                    Log.d(TAG, "Something went wrong!!!");
+                }
+            } else{
+                js.cancelAll();
+            }
         }
-        ComponentName cn = new ComponentName(ctx, LogBcastReceiver.class);
-        packageManager.setComponentEnabledSetting(cn, newState, PackageManager.DONT_KILL_APP);
     }
 
     public static boolean LogBCastReceiverisOn(Context ctx){
