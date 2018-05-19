@@ -29,6 +29,8 @@ public class LogBcastReceiver extends BroadcastReceiver {
     private static volatile long lastUploadScheduledTS = 0;
     private static volatile boolean uploadNecessary = false;
 
+    private static final int TWOMINUTES_MS = 120000; // 120,000 ms  = 2 minutes
+
     private Context ctx;
 
     @Override
@@ -128,13 +130,13 @@ public class LogBcastReceiver extends BroadcastReceiver {
             }
 
             long diff = System.currentTimeMillis() - lastUploadScheduledTS;
-            while(diff < 10000) { // ten seconds in milliseconds
+            while(diff < TWOMINUTES_MS) {
                 try {
 
                     // Wait a random amount of time so that the threads wake up
                     // at different times
                     Random r = new Random();
-                    long sleepTime = r.nextInt(10000);
+                    long sleepTime = r.nextInt(60000); // on minute wait time
                     Thread.currentThread().sleep(sleepTime);
 
                 } catch (InterruptedException e1) {

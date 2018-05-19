@@ -70,7 +70,7 @@ public class Main extends AppCompatActivity {
         int issue = getIssue();
         switch(issue){
             case ISSUE_ANDROID_8:
-                tv.setText("Android 8 not supported");
+                tv.setText("Android 8 and newer not supported");
                 tv.setTextColor(Color.parseColor("#800000"));
                 break;
 
