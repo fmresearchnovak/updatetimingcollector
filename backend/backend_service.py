@@ -17,8 +17,8 @@ LOG_FILE_NAME = "logfile.txt"
 
 
 def checkName(s):
-	if ".." in s or "/" in s or "\\" in s:
-		return False
+    if ".." in s or "/" in s or "\\" in s:
+        return False
 
     valid_chars = string.ascii_lowercase + "."
     for character in s:
