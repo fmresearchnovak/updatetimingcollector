@@ -9,11 +9,22 @@ import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import os
 import hashlib
+import string
 
 HOST_NAME = '155.68.120.41'
 PORT_NUMBER = 9000
 LOG_FILE_NAME = "logfile.txt"
 
+
+def checkName(s):
+	if ".." in s or "/" in s or "\\" in s:
+		return False
+
+    valid_chars = string.ascii_lowercase + "."
+    for character in s:
+        if character not in valid_chars:
+            return False
+    return True
 
 def sha256(data):
     H = hashlib.sha256()
@@ -64,8 +75,19 @@ class FileHandler(BaseHTTPRequestHandler):
         post_data = self.rfile.read(content_length).decode("UTF-8")
         #print("posted data:", repr(post_data))
 
-        name = post_data.split("\r\n")[1].split("=")[2].strip("\"")
-        #print("\nName: ", repr(name))
+        name = ""
+        try:
+            name = post_data.split("\r\n")[1].split("=")[2].strip("\"")
+            if(not checkName(name)):
+                raise IndexError
+
+        except IndexError:
+            s = "Invalid file name.  Possibly malicious!  Ignoring file: " + name
+            logFH.write(s)
+            self.finish_clean(logFH)
+            return
+        
+        #print("\nName: ", name, repr(name))
 
         file_contents = post_data.split("\r\n")[4].strip("-")
         #print("\nFile Contents:", repr(file_contents))
@@ -96,13 +118,13 @@ class FileHandler(BaseHTTPRequestHandler):
             s = "\tWrote to: " + str(location) + "\n"
             logFH.write(s)
 
-            self.respond_ok()
         else:
             s = "Verification failed!!\n"
             logFH.write(s)
 
-        logFH.write("\n")
-        logFH.close()
+        self.finish_clean(logFH)
+
+
 
 
 
@@ -110,6 +132,11 @@ class FileHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
+
+    def finish_clean(self, logFH):
+        logFH.write("\n")
+        logFH.close() 
+        self.respond_ok()
 
 
 
