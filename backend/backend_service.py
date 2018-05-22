@@ -20,7 +20,7 @@ def checkName(s):
     if ".." in s or "/" in s or "\\" in s:
         return False
 
-    valid_chars = string.ascii_lowercase + "."
+    valid_chars = string.digits + ".csv"
     for character in s:
         if character not in valid_chars:
             return False
