@@ -8,6 +8,7 @@ import time
 import datetime
 import sys
 import stat
+import moments
 
 # Author: Prof. Novak
 # Description: This script uses a companion ruby script
@@ -28,17 +29,10 @@ ALL_777 = stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | \
 stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP | \
 stat.S_IROTH | stat.S_IWOTH | stat.S_IXOTH
 
-def currentTimeMillis():
-	# Get the current time (local to this machine) in ms (unix time in ms)
-	# This is used to name the output  ".csv" file
-	return int(round(time.time() * 1000))
 
 
-def dateStringToUnixTS(dateString):
-	# Convert a date string (Month day, year)
-	# to a millisecond timestamp (unix time in ms)
-	ans = time.mktime(datetime.datetime.strptime(dateString, "%B %d, %Y").timetuple())
-	return ans
+
+
 
 
 def main():
@@ -93,7 +87,7 @@ def main():
 	#
 	# The file name is the current time in milliseconds (unix time ms)
 	# in the availability/ folder which should already exist!!!
-	fName = "availability/" + str(currentTimeMillis()) + ".csv"
+	fName = "availability/" + str(moments.currentTimeMillis()) + ".csv"
 	print("fName:", fName)
 	outF = open(fName, 'w')
 	os.chmod(fName, ALL_777)
@@ -121,7 +115,7 @@ def main():
 		# In these cases we simply write the app name to the file with no other info
 		if(len(err) == 0):
 			appInfo = [n] + output
-			appInfo[3] = str(dateStringToUnixTS(appInfo[3]))
+			appInfo[3] = str(moments.dateStringToUnixTS(appInfo[3]))
 		else:
 			appInfo = [n]
 
