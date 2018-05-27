@@ -51,9 +51,7 @@ public class LogView extends AppCompatActivity {
             loadAndDisplayFile();
 
         } else if (menuItem.getItemId() == R.id.action_upload) {
-            File f = Lib.getLogFile(this);
-            FilePOSTer fp = new FilePOSTer(f, this, true);
-            fp.execute();
+            FilePOSTer.scheduleUpload(this, true);
         }
 
         return true;

@@ -158,10 +158,6 @@ public class Main extends AppCompatActivity {
             return ISSUE_PERMS;
         }
 
-        if(!Lib.LogBCastReceiverisOn(ctx)){
-            return ISSUE_UNKNOWN;
-        }
-
         return ISSUE_NONE;
     }
 }

@@ -77,21 +77,15 @@ public class Lib {
 
     public static String getIMEI(Context ctx){
         TelephonyManager tManager = (TelephonyManager)ctx.getSystemService(Context.TELEPHONY_SERVICE);
-
-        try {
-            if (Build.VERSION.SDK_INT < 26) {
-                return tManager.getDeviceId();
-            } else if (Build.VERSION.SDK_INT >= 26) {
-                return tManager.getImei();
-            }
+        try{
+            return tManager.getImei();
         } catch (SecurityException e1){
-            //Log.d(TAG, "Cannot obtain unique identify for permission / security reasons on this device");
+            return "0";
         }
-        return "0";
     }
 
     public static File getLogFile(Context ctx){
-        String fileName = getIMEI(ctx) + ".csv";
+        String fileName = getIMEI(ctx) + "_new.csv";
 
         File envDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
         if(!envDir.exists()){
@@ -168,50 +162,13 @@ public class Lib {
 
 
     public static void LoggingOnOff(Context ctx, boolean newState){
-        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-            if(packageManager == null){
-                packageManager = ctx.getPackageManager();
-            }
-            ComponentName cn = new ComponentName(ctx, LogBcastReceiver.class);
-
-            int codedState;
-            if(newState){
-                codedState = PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
-            } else {
-                codedState = PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
-            }
-
-            packageManager.setComponentEnabledSetting(cn, codedState, PackageManager.DONT_KILL_APP);
-
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            JobScheduler js = (JobScheduler) ctx.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-            if(newState) {
-                ComponentName cn = new ComponentName(ctx, LoggingJobSchedulerService.class);
-                JobInfo.Builder b = new JobInfo.Builder(1, cn);
-                //b.setPeriodic(7200000); // 2hrs = 7.2M milliseconds
-                b.setPeriodic(2000); // 2 seconds = 2000 milliseconds
-                int res = js.schedule(b.build());
-                if (res < 0) {
-                    Log.d(TAG, "Something went wrong!!!");
-                }
-            } else{
-                js.cancelAll();
-            }
+        if(newState) {
+            LoggingJobSchedulerService.scheduleNextCheck(ctx);
+        } else{
+            LoggingJobSchedulerService.cancel(ctx);
         }
     }
 
-    public static boolean LogBCastReceiverisOn(Context ctx){
-        Log.d(TAG, "CALLED!!");
-        if(packageManager == null){
-            packageManager = ctx.getPackageManager();
-        }
-        packageManager = ctx.getPackageManager();
-        ComponentName cn = new ComponentName(ctx, LogBcastReceiver.class);
-        //pm.setComponentEnabledSetting(cn, newState, PackageManager.DONT_KILL_APP);
-        int state = packageManager.getComponentEnabledSetting(cn);
-        Log.d(TAG, "state: " + state);
-        return packageManager.getComponentEnabledSetting(cn) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
-    }
 
 
     public static boolean hasPermissions(Context ctx){
