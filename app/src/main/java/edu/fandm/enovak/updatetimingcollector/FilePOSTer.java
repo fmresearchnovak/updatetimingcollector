@@ -20,9 +20,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+import java.util.Random;
 
 import static edu.fandm.enovak.updatetimingcollector.Lib.PREF_FILE_NAME;
+import static edu.fandm.enovak.updatetimingcollector.Lib.getLogFile;
 import static edu.fandm.enovak.updatetimingcollector.Main.TAG;
 
 /**
@@ -45,6 +46,18 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
     private boolean toastsOn;
     private boolean networkOn;
 
+
+    // Each time a file should be posted a new instance of
+    // this class is created.  So, I need these to be static so
+    // that the threads can read / write single entities (across
+    // multiple instances of this class.
+    // The volatile makes reading / writing them thread safe
+    // Note: it does not protect against read and then write
+    // it only protects against reading or writing (as atomic instructions)
+    private static volatile long lastUploadScheduledTS = 0;
+    private static volatile boolean uploadNecessary = false;
+    private final static int uploadWaitTimeMS = 5000; // 5seconds in ms
+
     public FilePOSTer(File newF, Context context, boolean withToasts) throws IllegalArgumentException{
         ctx = context;
         toastsOn = withToasts;
@@ -61,29 +74,83 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected void onPreExecute(){
-        ConnectivityManager conMgr =  (ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = conMgr.getActiveNetworkInfo();
-        if (netInfo == null){
-            makeToastWithCheck("No network connection");
-        } else {
-            networkOn = true;
+        lastUploadScheduledTS = System.currentTimeMillis();
+
+
+        networkOn = networkConnectivity();
+        if(!networkOn){
+            makeToastWithCheck("No network connection!");
         }
+
+
+        // Race conditions?
+        // Case 1, this thread marks this true after a UploadWaitThread marked it false
+        //      No problem, that just means that it will be uploaded again (normal case)
+        // Case 2, this thread marks this false after an UploadWaitThread marked it true
+        //      That literally is not possible because this thread does not make it false
+        uploadNecessary = true;
+
     }
 
     @Override
     protected Boolean doInBackground(Void... params){
         Boolean success = false;
-        if(networkOn) {
+
+        // Wait for some time (to avoid rapid uploads) and wait for some network
+        // connectivity.
+        //   - The uploadTimeWait is only an issue if the user manually uploads rapidly.
+        long diff = System.currentTimeMillis() - lastUploadScheduledTS;
+        while(diff < uploadWaitTimeMS || !networkConnectivity()) {
+            Log.d(TAG, "Waiting to upload logfile.  Waiting on uploadTimeBuffer or Network Connectivity");
+            try {
+
+                // Wait a random amount of time so that the threads wake up
+                // at different times (assuming there are multiple threads)
+                Random r = new Random();
+                long sleepTime = r.nextInt(uploadWaitTimeMS);
+                Thread.sleep(sleepTime);
+
+            } catch (InterruptedException e1) {
+                // Do nothing if interrupted (oh-well, forge ahead!)
+            }
+            diff = System.currentTimeMillis() - lastUploadScheduledTS;
+
+            // Give-up waiting if upload is no longer necessary
+            if(!uploadNecessary){
+                return false;
+            }
+        }
+
+
+        // Again, check if we should just die since we just waited a bit
+        //Log.d(TAG, "Checking if upload necessary: " + uploadNecessary);
+        if(uploadNecessary){
+            // There is a race condition here
+            // But I don't care for now.  The worst thing that happens is that the file is
+            // uploaded twice.
+            //
+            // This happens if one Thread checks the if statement above just before
+            // some other thread switched it to false (below).
+            //
+            // Even in this case, the file will be uploaded twice (not so bad)
+            // I don't think any entries from the actual log contents will be
+            // lost because the thread reads the entire file.  And this is at
+            // least 60 seconds after the last time the file was written thanks
+            // to the while loop above
+            uploadNecessary = false;
+            //Log.d(TAG, "Thread in BcastReceiver will now upload.  Upload necessary is now: " + uploadNecessary);
+
             success = postFile();
         }
+
         return success;
     }
 
     @Override
     protected void onPostExecute(Boolean result){
-        String s = "";
+        String s;
         if(result){
-            s = "Log Uploaded!";
+            s = "SUCCESS!  Logfile uploaded!";
 
             // Save a timestamp, this will be displayed to user in the
             // "status" activity
@@ -93,17 +160,16 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
             e.putLong(Lib.PREF_SERV_TS_KEY, ts);
             e.commit();
 
-            ts = sharedPref.getLong(Lib.PREF_SERV_TS_KEY, -1);
-
-            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a");
-            String dateString = formatter.format(new Date(ts));
-
+            //ts = sharedPref.getLong(Lib.PREF_SERV_TS_KEY, -1);
+            //SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a");
+            //String dateString = formatter.format(new Date(ts));
             //Log.d(TAG, "Success uploading to server at: " + dateString);
 
         } else {
             s = "Upload Failed!";
         }
         makeToastWithCheck(s);
+        Log.d(TAG, s);
     }
 
 
@@ -153,10 +219,10 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
             }
             responseStreamReader.close();
 
-            String response = sb.toString();
-            if(response != "") {
+            //String response = sb.toString();
+            //if(response != "") {
                 //Log.d(TAG, "response: " + response);
-            }
+            //}
 
             // Disconnect and return result
             httpURLConnection.disconnect();
@@ -179,4 +245,15 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
         }
     }
 
+
+    private boolean networkConnectivity(){
+        ConnectivityManager conMgr =  (ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = conMgr.getActiveNetworkInfo();
+        return netInfo != null;
+    }
+
+    public static void scheduleUpload(Context ctx, boolean withToast){
+        FilePOSTer fp = new FilePOSTer(getLogFile(ctx), ctx, withToast);
+        fp.execute();
+    }
 }

@@ -1,18 +1,12 @@
 package edu.fandm.enovak.updatetimingcollector;
 
 import android.Manifest;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
-import android.text.style.TtsSpan;
-import android.util.Log;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,13 +14,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.LongBuffer;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-
-import static edu.fandm.enovak.updatetimingcollector.Main.TAG;
 
 /**
  * Created by enovak on 3/1/18.
@@ -39,14 +28,9 @@ public class Lib {
     public static final String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.INTERNET};
 
 
-    private static PackageManager packageManager;
-
     public static boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
 
@@ -71,24 +55,40 @@ public class Lib {
         return null;
     }
 
+    public static boolean isNewerAndroid(){
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+    }
+
 
     public static String getIMEI(Context ctx){
+
         TelephonyManager tManager = (TelephonyManager)ctx.getSystemService(Context.TELEPHONY_SERVICE);
 
-        try {
-            if (Build.VERSION.SDK_INT < 26) {
-                return tManager.getDeviceId();
-            } else if (Build.VERSION.SDK_INT >= 26) {
-                return tManager.getImei();
+        String ans = "could_not_get_IMEI";
+        try{
+            if(isNewerAndroid()) {
+                ans = tManager.getImei();
+            } else {
+                ans = tManager.getDeviceId();
             }
         } catch (SecurityException e1){
-            //Log.d(TAG, "Cannot obtain unique identify for permission / security reasons on this device");
+
+        } catch (NullPointerException e2){
+
         }
-        return "0";
+
+        return ans;
+
+
     }
 
     public static File getLogFile(Context ctx){
-        String fileName = getIMEI(ctx) + ".csv";
+        String fileName = getIMEI(ctx);
+        if(isNewerAndroid()){
+            fileName = fileName + "_new.csv";
+        } else {
+            fileName = fileName + ".csv";
+        }
 
         File envDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
         if(!envDir.exists()){
@@ -107,8 +107,10 @@ public class Lib {
         return f;
     }
 
+
+
     public static boolean writeFile(File f, String entry){
-        FileOutputStream fos = null;
+        FileOutputStream fos;
         try{
             fos = new FileOutputStream(f, true);
             //Log.d(TAG, "Writing:" + entry + "   to file: " + f.getAbsolutePath());
@@ -134,7 +136,7 @@ public class Lib {
 
             StringBuilder sb = new StringBuilder();
             byte[] buffer = new byte[1024];
-            FileInputStream fis = null;
+            FileInputStream fis;
 
             try{
                 fis = new FileInputStream(f);
@@ -164,26 +166,31 @@ public class Lib {
 
 
 
-    public static void LogBcastReceiverOnOff(Context ctx, int newState){
-        if(packageManager == null){
-            packageManager = ctx.getPackageManager();
+    public static void LoggingOnOff(Context ctx, boolean newState){
+
+            // In the new version of Android we periodically poll the package manager
+            // to look for changes
+        if(isNewerAndroid()){ // VERSION_CODES.O = OREO = API 26
+            if (newState) {
+                LoggingJobSchedulerService.scheduleNextCheck(ctx);
+            } else {
+                LoggingJobSchedulerService.cancel(ctx);
+            }
         }
-        ComponentName cn = new ComponentName(ctx, LogBcastReceiver.class);
-        packageManager.setComponentEnabledSetting(cn, newState, PackageManager.DONT_KILL_APP);
+
+
+        // For older versions of Android we can use the broadcast receiver
+        // to capture install / update / uninstall events when they happen
+        else {
+            if(newState) {
+                LogBcastReceiver.setEnabled(ctx, PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
+            } else {
+                LogBcastReceiver.setEnabled(ctx, PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
+            }
+
+        }
     }
 
-    public static boolean LogBCastReceiverisOn(Context ctx){
-        Log.d(TAG, "CALLED!!");
-        if(packageManager == null){
-            packageManager = ctx.getPackageManager();
-        }
-        packageManager = ctx.getPackageManager();
-        ComponentName cn = new ComponentName(ctx, LogBcastReceiver.class);
-        //pm.setComponentEnabledSetting(cn, newState, PackageManager.DONT_KILL_APP);
-        int state = packageManager.getComponentEnabledSetting(cn);
-        Log.d(TAG, "state: " + state);
-        return packageManager.getComponentEnabledSetting(cn) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
-    }
 
 
     public static boolean hasPermissions(Context ctx){
@@ -198,10 +205,7 @@ public class Lib {
                 break;
             }
         }
-        if(needsPermissions){
-            return false;
-        } else {
-            return true;
-        }
+
+        return !needsPermissions;
     }
 }

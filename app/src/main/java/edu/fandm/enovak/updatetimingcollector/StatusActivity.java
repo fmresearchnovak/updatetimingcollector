@@ -2,12 +2,9 @@ package edu.fandm.enovak.updatetimingcollector;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import java.io.File;
@@ -37,9 +34,14 @@ public class StatusActivity extends AppCompatActivity {
 
         // --- 1 ---
         // Logging status
-        boolean isLogging = Lib.LogBCastReceiverisOn(ctx);
-        if(isLogging && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            setStatusText(true);
+        boolean isON = isLogging();
+        TextView statusTV = (TextView)findViewById(R.id.status_tv_status_val);
+        if(isON){
+            statusTV.setText("Active");
+            statusTV.setTextColor(Color.parseColor("#147e00"));
+        } else {
+            statusTV.setText("Inactive");
+            statusTV.setTextColor(Color.parseColor("#bbbbbb"));
         }
 
 
@@ -50,7 +52,7 @@ public class StatusActivity extends AppCompatActivity {
         long ts = sharedPref.getLong(Lib.PREF_SERV_TS_KEY, -1);
         if(ts != -1) {
             SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
-            Log.d(Main.TAG, "ts: " + ts);
+            //Log.d(Main.TAG, "ts: " + ts);
             String dateString = formatter.format(new Date(ts));
             TextView tsTV = (TextView) findViewById(R.id.status_tv_server_ts_val);
             tsTV.setText(dateString);
@@ -63,8 +65,8 @@ public class StatusActivity extends AppCompatActivity {
         File logF = Lib.getLogFile(ctx);
         if(logF != null) {
             long bytes = logF.length();
-            Log.d(Main.TAG, "name: " + logF.getAbsoluteFile());
-            Log.d(Main.TAG, "bytes: " + bytes);
+            //Log.d(Main.TAG, "name: " + logF.getAbsoluteFile());
+            //Log.d(Main.TAG, "bytes: " + bytes);
             if (bytes != 0L) {
                 TextView sizeTV = (TextView) findViewById(R.id.status_tv_bytes_contrib_val);
                 sizeTV.setText(bytes + " Bytes of data");
@@ -74,16 +76,11 @@ public class StatusActivity extends AppCompatActivity {
     }
 
 
-    private void setStatusText(boolean isON){
-
-
-        TextView statusTV = (TextView)findViewById(R.id.status_tv_status_val);
-        if(isON){
-            statusTV.setText("Active");
-            statusTV.setTextColor(Color.parseColor("#147e00"));
+    private boolean isLogging(){
+        if(Lib.isNewerAndroid()){
+            return LoggingJobSchedulerService.isScheduled(ctx);
         } else {
-            statusTV.setText("Inactive");
-            statusTV.setTextColor(Color.parseColor("#bbbbbb"));
+            return LogBcastReceiver.isEnabled(ctx);
         }
     }
 }

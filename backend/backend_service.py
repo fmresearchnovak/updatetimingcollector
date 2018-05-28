@@ -20,7 +20,7 @@ def checkName(s):
     if ".." in s or "/" in s or "\\" in s:
         return False
 
-    valid_chars = string.digits + ".csv"
+    valid_chars = string.digits + "_new.csv"
     for character in s:
         if character not in valid_chars:
             return False
@@ -34,6 +34,11 @@ def sha256(data):
 
 def getFile(fileName):
     path = "./data/"
+
+    # accomodate the newer style logs with Android 8+
+    if(fileName[-8:] == "_new.csv"):
+    	path = "./data/new/"
+
     if not os.path.exists(path):
         os.makedirs(path)
     absPath = path + fileName

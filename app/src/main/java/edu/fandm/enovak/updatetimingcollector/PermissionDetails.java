@@ -1,7 +1,7 @@
 package edu.fandm.enovak.updatetimingcollector;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 public class PermissionDetails extends AppCompatActivity {
 

@@ -1,22 +1,13 @@
 package edu.fandm.enovak.updatetimingcollector;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 public class LogView extends AppCompatActivity {
 
@@ -51,9 +42,7 @@ public class LogView extends AppCompatActivity {
             loadAndDisplayFile();
 
         } else if (menuItem.getItemId() == R.id.action_upload) {
-            File f = Lib.getLogFile(this);
-            FilePOSTer fp = new FilePOSTer(f, this, true);
-            fp.execute();
+            FilePOSTer.scheduleUpload(this, true);
         }
 
         return true;

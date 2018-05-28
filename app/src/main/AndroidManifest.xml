@@ -33,6 +33,8 @@
         </activity>
         <activity android:name=".LogView" />
 
+        <activity android:name=".PermissionDetails" />
+
         <receiver
             android:name=".LogBcastReceiver"
             android:exported="true">
@@ -48,8 +50,6 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".PermissionDetails" />
-
         <receiver
             android:name=".BootBcastReceiver"
             android:enabled="true"
@@ -60,6 +60,14 @@
         </receiver>
 
         <activity android:name=".StatusActivity"></activity>
+
+        <service
+            android:name=".LoggingJobSchedulerService"
+            android:label="Update Collector Logging service"
+            android:permission="android.permission.BIND_JOB_SERVICE" >
+        </service>
+
+
     </application>
 
 </manifest>

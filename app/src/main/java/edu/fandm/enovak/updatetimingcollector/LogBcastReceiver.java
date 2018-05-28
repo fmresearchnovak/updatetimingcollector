@@ -1,41 +1,22 @@
 package edu.fandm.enovak.updatetimingcollector;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.Bundle;
 import android.util.Log;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Random;
 
 import static android.content.ContentValues.TAG;
-import static android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE;
 import static edu.fandm.enovak.updatetimingcollector.Lib.writeFile;
 
 public class LogBcastReceiver extends BroadcastReceiver {
 
-    // Each time onReceive is called there is a new instance of
-    // the broadcast receiver.  So I need these to be static so
-    // that the threads can read / write single entities (across
-    // multiple instances of LogBcastReceiver
-    // The volatile makes reading / writing them thread safe
-    // Note: it does not protect against read and then write
-    // it only protects against reading or writing (as atomic instructions)
-    private static volatile long lastUploadScheduledTS = 0;
-    private static volatile boolean uploadNecessary = false;
-
-    private static final int TWOMINUTES_MS = 120000; // 120,000 ms  = 2 minutes
-
-    private Context ctx;
-
     @Override
-    public void onReceive(Context context, Intent intent) {
-        ctx = context;
+    public void onReceive(Context ctx, Intent intent) {
 
         String action = intent.getAction();
         Log.d(TAG, "Broadcast Received!!  intent: " + intent.toString() + "  action:" + action);
@@ -44,7 +25,7 @@ public class LogBcastReceiver extends BroadcastReceiver {
 
 
             case Intent.ACTION_AIRPLANE_MODE_CHANGED:
-                Log.d(TAG, "Airplane Mode");
+                //Log.d(TAG, "Airplane Mode");
                 break;
 
             case Intent.ACTION_PACKAGE_REPLACED:
@@ -59,7 +40,7 @@ public class LogBcastReceiver extends BroadcastReceiver {
                         PackageManager pm = ctx.getPackageManager();
                         String entry = genEntryString(pm, appUID, action);
                         writeFile(logFile, entry);
-                        scheduleUpload();
+                        FilePOSTer.scheduleUpload(ctx, false);
 
                     } else {
                         // Not sure what I should do here!
@@ -85,7 +66,7 @@ public class LogBcastReceiver extends BroadcastReceiver {
         // file, but I think by the nature of the broadcast receiver it is
         // unavoidable.
         String pkgName = pm.getNameForUid(uid);
-        String entryStr = "";
+        String entryStr;
 
         int version;
         try {
@@ -103,71 +84,18 @@ public class LogBcastReceiver extends BroadcastReceiver {
         return entryStr;
     }
 
-    private void scheduleUpload(){
 
-        lastUploadScheduledTS = System.currentTimeMillis();
-
-        // Race conditions?
-        // Case 1, this thread marks this true after a UploadWaitThread marked it false
-        //      No problem, that just means that it will be uploaded again (normal case)
-        // Case 2, this thread marks this false after an UploadWaitThread marked it true
-        //      That literally is not possible because this thread does not make it false
-        uploadNecessary = true;
-
-        // Schedule a thread to wait and do the upload
-        Thread t = new Thread(new UploadWaitThread());
-        t.start();
+    public static void setEnabled(Context ctx, int enabled){
+        PackageManager pm = ctx.getPackageManager();
+        ComponentName cn = new ComponentName(ctx, LogBcastReceiver.class);
+        pm.setComponentEnabledSetting(cn, enabled, PackageManager.DONT_KILL_APP);
     }
 
 
-    private class UploadWaitThread implements Runnable {
-        @Override
-        public void run() {
-
-            // Die immediately if an upload isn't necessary
-            if(!uploadNecessary){
-                return;
-            }
-
-            long diff = System.currentTimeMillis() - lastUploadScheduledTS;
-            while(diff < TWOMINUTES_MS) {
-                try {
-
-                    // Wait a random amount of time so that the threads wake up
-                    // at different times
-                    Random r = new Random();
-                    long sleepTime = r.nextInt(60000); // on minute wait time
-                    Thread.currentThread().sleep(sleepTime);
-
-                } catch (InterruptedException e1) {
-                    // Do nothing if interrupted (oh-well, forge ahead!)
-                }
-                diff = System.currentTimeMillis() - lastUploadScheduledTS;
-            }
-
-            // Again, check if we should just die since we just waited a bit
-            //Log.d(TAG, "Checking if upload necessary: " + uploadNecessary);
-            if(uploadNecessary){
-                // There is a race condition here
-                // But I don't care for now.  The worst thing that happens is that the file is
-                // uploaded twice.
-                //
-                // This happens if one Thread checks the if statement above just before
-                // some other thread switched it to false (below).
-                //
-                // Even in this case, the file will be uploaded twice (not so bad)
-                // I don't think any entries from the actual log contents will be
-                // lost because the thread reads the entire file.  And this is at
-                // least 10 seconds after the last time the file was written thanks
-                // to the while loop above
-                uploadNecessary = false;
-                //Log.d(TAG, "Thread in BcastReceiver will now upload.  Upload necessary is now: " + uploadNecessary);
-
-
-                FilePOSTer fp = new FilePOSTer(Lib.getLogFile(ctx), ctx, false);
-                fp.execute();
-
-            }
-        }
+    public static boolean isEnabled(Context ctx){
+        PackageManager pm = ctx.getPackageManager();
+        ComponentName cn = new ComponentName(ctx, LogBcastReceiver.class);
+        return pm.getComponentEnabledSetting(cn) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
     }
+
 }
