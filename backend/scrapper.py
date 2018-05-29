@@ -4,8 +4,6 @@ import glob
 import os
 import subprocess
 from subprocess import PIPE
-import time
-import datetime
 import sys
 import stat
 import moments
