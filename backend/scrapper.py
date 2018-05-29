@@ -39,7 +39,7 @@ def main():
 	if len(sys.argv) == 2:
 		os.chdir(sys.argv[1])
 	else:
-		os.chdir("/srv/update-timing-collector-backend/data/")
+		os.chdir("/srv/updatetimingcollector/backend/data/")
 
 	# Lookup all of the CSV files in this directory.
 	# This is meant to be run in the data/ directory (see line above)

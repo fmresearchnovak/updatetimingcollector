@@ -9,3 +9,5 @@
 .externalNativeBuild
 /backend/data/
 zip_keystore
+__pycache__
+nohup.out
