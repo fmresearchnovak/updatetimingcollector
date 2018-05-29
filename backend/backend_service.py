@@ -105,7 +105,7 @@ class FileHandler(BaseHTTPRequestHandler):
 
         s = "Appears to be a valid file upload from a client...\n"
         logFH.write(s)
-        s = "Name:" + name + "  recieved hash:" + repr(nameHashed) + "  computed hash:" + repr(computedHash) + "\n"
+        s = "Name:" + name + "\n"
         logFH.write(s)
         #print(nameHashed)
         #print(computedHash)
