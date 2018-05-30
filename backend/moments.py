@@ -23,6 +23,10 @@ def minutesToSeconds(ts):
 def msToSeconds(ts):
 	return ts / 1000
 
+def msToHours(ts):
+	return ts / (1000 * 60 * 60)
+
+
 def secondsToTimeCode(ts):
 	h = ts // (60 * 60)
 	ts = ts - (h * 60 * 60)
