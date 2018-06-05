@@ -73,6 +73,12 @@ public class StatusActivity extends AppCompatActivity {
                 sizeTV.setTextColor(Color.parseColor("#147e00"));
             }
         }
+
+        // --- 4 ---
+        // IMEI number
+        String IMEI = Lib.getIMEI(ctx);
+        TextView imeiTV = (TextView) findViewById(R.id.status_tv_imei_contrib_val);
+        imeiTV.setText(IMEI);
     }
 
 
