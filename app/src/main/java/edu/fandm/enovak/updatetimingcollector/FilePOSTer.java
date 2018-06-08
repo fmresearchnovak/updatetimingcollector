@@ -141,6 +141,9 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
             //Log.d(TAG, "Thread in BcastReceiver will now upload.  Upload necessary is now: " + uploadNecessary);
 
             success = postFile();
+            if(!success){
+                Log.d(TAG, "UPLOAD FAILED!");
+            }
         }
 
         return success;
@@ -166,7 +169,7 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
             //Log.d(TAG, "Success uploading to server at: " + dateString);
 
         } else {
-            s = "Upload Failed!";
+            s = "File Not Uploaded!";
         }
         makeToastWithCheck(s);
         Log.d(TAG, s);

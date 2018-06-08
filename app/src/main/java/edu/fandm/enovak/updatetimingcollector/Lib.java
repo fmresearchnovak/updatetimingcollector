@@ -83,12 +83,7 @@ public class Lib {
     }
 
     public static File getLogFile(Context ctx){
-        String fileName = getIMEI(ctx);
-        if(isNewerAndroid()){
-            fileName = fileName + "_new.csv";
-        } else {
-            fileName = fileName + ".csv";
-        }
+        String fileName = getIMEI(ctx) + ".csv";
 
         File envDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
         if(!envDir.exists()){
