@@ -11,3 +11,4 @@
 zip_keystore
 __pycache__
 nohup.out
+app/release

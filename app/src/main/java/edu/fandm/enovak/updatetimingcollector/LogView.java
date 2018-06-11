@@ -42,7 +42,7 @@ public class LogView extends AppCompatActivity {
             loadAndDisplayFile();
 
         } else if (menuItem.getItemId() == R.id.action_upload) {
-            FilePOSTer.scheduleUpload(this, true);
+            FilePOSTer.scheduleUpload(this, true, 2000); // 2 seconds in ms
         }
 
         return true;

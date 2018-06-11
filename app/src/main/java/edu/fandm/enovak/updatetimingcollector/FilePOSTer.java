@@ -56,7 +56,7 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
     // it only protects against reading or writing (as atomic instructions)
     private static volatile long lastUploadScheduledTS = 0;
     private static volatile boolean uploadNecessary = false;
-    private final static int uploadWaitTimeMS = 5000; // 5seconds in ms
+    private static int uploadWaitTimeMS;
 
     public FilePOSTer(File newF, Context context, boolean withToasts) throws IllegalArgumentException{
         ctx = context;
@@ -249,14 +249,15 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
     }
 
 
-    private boolean networkConnectivity(){
-        ConnectivityManager conMgr =  (ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+    private boolean networkConnectivity() {
+        ConnectivityManager conMgr = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = conMgr.getActiveNetworkInfo();
         return netInfo != null;
     }
 
-    public static void scheduleUpload(Context ctx, boolean withToast){
+    public static void scheduleUpload(Context ctx, boolean withToast, int buffTime){
         FilePOSTer fp = new FilePOSTer(getLogFile(ctx), ctx, withToast);
+        fp.uploadWaitTimeMS = buffTime;
         fp.execute();
     }
 }

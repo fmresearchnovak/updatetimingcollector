@@ -77,7 +77,7 @@ public class LoggingJobSchedulerService extends JobService {
                     for (int i = 0; i < newLogEntries.size(); i++) {
                         writeFile(logFile, newLogEntries.get(i) + "\n");
                     }
-                    FilePOSTer.scheduleUpload(ctx, false);
+                    FilePOSTer.scheduleUpload(ctx, false, 180000); // 3 min in ms
                 }
 
                 lastScanResults = newScanResults;
