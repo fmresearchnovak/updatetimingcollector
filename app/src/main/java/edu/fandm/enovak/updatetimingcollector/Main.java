@@ -82,6 +82,11 @@ public class Main extends AppCompatActivity {
                 startActivity(i);
                 break;
 
+            case R.id.view_chart:
+                i = new Intent(ctx, ViewChart.class);
+                startActivity(i);
+                break;
+
             case R.id.permissions_reprompt:
                 boolean hasPerms = Lib.hasPermissions(ctx);
                 if(hasPerms){

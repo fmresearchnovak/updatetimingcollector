@@ -12,6 +12,11 @@
         android:title="View Log"/>
 
     <item
+        android:id="@+id/view_chart"
+        app:showAsAction="never"
+        android:title="View Chart" />
+
+    <item
         android:id="@+id/permissions_details"
         app:showAsAction="never"
         android:title="Permission Details"/>

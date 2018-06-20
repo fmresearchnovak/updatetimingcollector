@@ -63,7 +63,7 @@ public class LogView extends AppCompatActivity {
         }
 
         protected String doInBackground(Void... params){
-            Log.d(Main.TAG, "Loading file background...");
+            //Log.d(Main.TAG, "Loading file background...");
             File f = Lib.getLogFile(ctx);
             String contents = Lib.readFile(f);
 
@@ -71,7 +71,7 @@ public class LogView extends AppCompatActivity {
         }
 
         protected void onPostExecute(String contents) {
-            Log.d(Main.TAG, "Done loading file.  Displaying now!");
+            //Log.d(Main.TAG, "Done loading file.  Displaying now!");
             if (contents == null) {
                 mainTV.setText("Error reading log file.");
             } else if (contents.equals("")) {

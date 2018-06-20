@@ -109,7 +109,7 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
                 // at different times (assuming there are multiple threads)
                 Random r = new Random();
                 long sleepTime = r.nextInt(uploadWaitTimeMS);
-                Log.d(TAG, "Sleeping for: " + sleepTime + "ms");
+                Log.d(TAG, "FilePOSTer thread " + Thread.currentThread().getId() + " sleeping for: " + sleepTime + "ms");
                 Thread.sleep(sleepTime);
 
             } catch (InterruptedException e1) {
@@ -260,6 +260,6 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
     public static void scheduleUpload(Context ctx, boolean withToast, int buffTime){
         FilePOSTer fp = new FilePOSTer(getLogFile(ctx), ctx, withToast);
         fp.uploadWaitTimeMS = buffTime;
-        fp.execute();
+        fp.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 }

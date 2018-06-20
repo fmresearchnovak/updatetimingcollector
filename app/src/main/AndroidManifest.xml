@@ -32,7 +32,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".LogView" />
-
         <activity android:name=".PermissionDetails" />
 
         <receiver
@@ -49,7 +48,6 @@
                 <action android:name="android.intent.action.AIRPLANE_MODE" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".BootBcastReceiver"
             android:enabled="true"
@@ -59,15 +57,14 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".StatusActivity"></activity>
+        <activity android:name=".StatusActivity" />
 
         <service
             android:name=".LoggingJobSchedulerService"
             android:label="Update Collector Logging service"
-            android:permission="android.permission.BIND_JOB_SERVICE" >
-        </service>
+            android:permission="android.permission.BIND_JOB_SERVICE"></service>
 
-
+        <activity android:name=".ViewChart"></activity>
     </application>
 
 </manifest>

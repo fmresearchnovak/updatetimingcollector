@@ -89,7 +89,6 @@ public class LoggingJobSchedulerService extends JobService implements Serializab
                     if(lastScanResults == null){
                         Log.d(TAG, "File also blank!  Using these scan results");
                         lastScanResults = newScanResults;
-                        return false;
                     }
                 }
 
@@ -101,9 +100,6 @@ public class LoggingJobSchedulerService extends JobService implements Serializab
                         writeFile(logFile, newLogEntries.get(i) + "\n");
                     }
                     FilePOSTer.scheduleUpload(ctx, false, 2000); // two seconds in ms
-                }
-                else {
-                    Log.d(TAG, "No difference between scans.");
                 }
 
                 lastScanResults = newScanResults;
@@ -197,14 +193,12 @@ public class LoggingJobSchedulerService extends JobService implements Serializab
             Entry old_e = (Entry)entryPair.getValue();
             Entry new_e = newScan.get(entryPair.getKey());
 
-            if(new_e == null){
-                if(new_e == null){
-                    tmp = ts + "," + "android.intent.action.PACKAGE_REMOVED" + "," + old_e.UID + "," + old_e.pkg + "," + old_e.versionCode;
-                    output.add(tmp);
-                } else if (new_e.isNewerThen(old_e)) {
-                    tmp = new_e.time + "," + "android.intent.action.PACKAGE_REPLACED" + "," + new_e.UID + "," + new_e.pkg + "," + new_e.versionCode;
-                    output.add(tmp);
-                }
+            if(new_e == null) {
+                tmp = ts + "," + "android.intent.action.PACKAGE_REMOVED" + "," + old_e.UID + "," + old_e.pkg + "," + old_e.versionCode;
+                output.add(tmp);
+            } else if (new_e.isNewerThen(old_e)) {
+                tmp = new_e.time + "," + "android.intent.action.PACKAGE_REPLACED" + "," + new_e.UID + "," + new_e.pkg + "," + new_e.versionCode;
+                output.add(tmp);
             }
         }
 
@@ -244,6 +238,8 @@ public class LoggingJobSchedulerService extends JobService implements Serializab
         final int FIVE_MIN = 300000;
 
         // 10 seconds = 10000;
+
+        final int TEN_SEC = 10000;
         // 2 seconds = 2000;
 
         scheduleNextCheck(ctx, TEN_MIN);
@@ -297,8 +293,6 @@ public class LoggingJobSchedulerService extends JobService implements Serializab
         String pkg;
         int versionCode;
 
-        protected Entry(){};
-
 
         public Entry(long newTime, int newUID, String newPkg, int newVersionCode){
             time = newTime;
@@ -312,10 +306,12 @@ public class LoggingJobSchedulerService extends JobService implements Serializab
         }
 
         public boolean isNewerThen(Entry other){
+            //Log.d(TAG, "Comparing this: " + this.toString() +  "  with  " + other.toString());
             if(!this.matchesPackage(other)){
                 throw new IllegalArgumentException("Packages must match!");
             }
 
+            //Log.d(TAG, "this.versionCode: " + this.versionCode + " > " + other.versionCode + "??");
             return this.versionCode > other.versionCode;
         }
 
