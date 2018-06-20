@@ -56,13 +56,14 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
     // it only protects against reading or writing (as atomic instructions)
     private static volatile long lastUploadScheduledTS = 0;
     private static volatile boolean uploadNecessary = false;
-    private static int uploadWaitTimeMS;
+    private int uploadWaitTimeMS;
 
     public FilePOSTer(File newF, Context context, boolean withToasts) throws IllegalArgumentException{
         ctx = context;
         toastsOn = withToasts;
         networkOn = false;
         contents = Lib.readFile(newF);
+        uploadWaitTimeMS = 1000;
 
         if(contents == null){
             throw new IllegalArgumentException("Unable to read file");
@@ -108,6 +109,7 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
                 // at different times (assuming there are multiple threads)
                 Random r = new Random();
                 long sleepTime = r.nextInt(uploadWaitTimeMS);
+                Log.d(TAG, "Sleeping for: " + sleepTime + "ms");
                 Thread.sleep(sleepTime);
 
             } catch (InterruptedException e1) {

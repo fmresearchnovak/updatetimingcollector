@@ -40,7 +40,7 @@ public class LogBcastReceiver extends BroadcastReceiver {
                         PackageManager pm = ctx.getPackageManager();
                         String entry = genEntryString(pm, appUID, action);
                         writeFile(logFile, entry);
-                        FilePOSTer.scheduleUpload(ctx, false, 300000); // 5 min in ms
+                        FilePOSTer.scheduleUpload(ctx, false, 63000); // 1.5 min in ms
 
                     } else {
                         // Not sure what I should do here!

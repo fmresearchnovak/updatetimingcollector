@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 
@@ -75,6 +76,15 @@ public class Lib {
 
         } catch (NullPointerException e2){
 
+        }
+
+        // This accounts for tablets and other devices that
+        // might not have an IMEI (that's only present on SIM-card devices)
+        // This 64-bit number will be reset if the device is factory reset
+
+        // https://medium.com/@ssaurel/how-to-retrieve-an-unique-id-to-identify-android-devices-6f99fd5369eb
+        if (ans.equals("could_not_get_IMEI")){
+            ans = Settings.Secure.getString(ctx.getContentResolver(), Settings.Secure.ANDROID_ID);
         }
 
         return ans;
@@ -167,7 +177,7 @@ public class Lib {
             // to look for changes
         if(isNewerAndroid()){ // VERSION_CODES.O = OREO = API 26
             if (newState) {
-                LoggingJobSchedulerService.scheduleNextCheck(ctx);
+                LoggingJobSchedulerService.scheduleNextCheck(ctx, 0); // Schedule for now
             } else {
                 LoggingJobSchedulerService.cancel(ctx);
             }
