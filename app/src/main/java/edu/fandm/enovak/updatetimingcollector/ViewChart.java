@@ -24,7 +24,9 @@ import com.github.mikephil.charting.utils.MPPointF;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -83,6 +85,8 @@ public class ViewChart extends AppCompatActivity {
 
 
     private class ChartLoader extends AsyncTask<Void, Void, BarData>{
+
+        private long earliestTS = 0;
         protected void onPreExecute(){
             bc.setNoDataText("Loading...");
         }
@@ -103,10 +107,20 @@ public class ViewChart extends AppCompatActivity {
             String[] parts = new String[5];
             String name;
             Integer val;
+
             for(String line : strList){
                 parts = line.split(",");
 
                 if(parts[1].equals("android.intent.action.PACKAGE_REPLACED")) {
+
+                    // Find the TS of the earliest "PACKAGE_REPLACED
+                    // event.  This gives a lower-bound on the time-frame of
+                    // this log / set of updates
+                    if(earliestTS == 0){
+                        earliestTS = Long.valueOf(parts[0]);
+                    }
+
+
                     name = parts[3];
 
                     if(updateCountDict.containsKey(name)){
@@ -150,8 +164,14 @@ public class ViewChart extends AppCompatActivity {
                 return;
             }
 
-            bc.setData(barData);
+            // Update title
+            SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy   h:mm:ss a");
+            String dateString = formatter.format(new Date(earliestTS));
+            TextView tv = (TextView)findViewById(R.id.view_chart_tv_title);
+            tv.setText("Number of Updates Since\n" + dateString);
 
+            // Update chart
+            bc.setData(barData);
             bc.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                 @Override
                 public void onValueSelected(Entry e, Highlight h) {
@@ -167,7 +187,7 @@ public class ViewChart extends AppCompatActivity {
             });
 
 
-
+            // re-draw the chart
             bc.invalidate();
 
         }
