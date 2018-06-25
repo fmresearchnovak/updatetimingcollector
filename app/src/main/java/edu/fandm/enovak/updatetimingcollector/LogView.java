@@ -75,7 +75,7 @@ public class LogView extends AppCompatActivity {
             if (contents == null) {
                 mainTV.setText("Error reading log file.");
             } else if (contents.equals("")) {
-                mainTV.setText("Log File Empty!  Install / update some apps.");
+                mainTV.setText("Log File Empty!  Install / update some apps first.");
             } else {
                 mainTV.setText(contents);
             }

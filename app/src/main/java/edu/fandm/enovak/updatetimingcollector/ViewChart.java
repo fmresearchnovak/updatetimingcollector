@@ -1,6 +1,8 @@
 package edu.fandm.enovak.updatetimingcollector;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -26,11 +28,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ThreadPoolExecutor;
+
+import static android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES;
 
 
 public class ViewChart extends AppCompatActivity {
@@ -38,6 +46,7 @@ public class ViewChart extends AppCompatActivity {
     private BarChart bc;
     private Context ctx;
     private String names[];
+    private String namesLong[];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +79,7 @@ public class ViewChart extends AppCompatActivity {
         bc.setDrawValueAboveBar(false);
 
 
-        bc.animateY(3000, Easing.EasingOption.EaseOutBack);
+        bc.animateY(1500, Easing.EasingOption.EaseOutBack);
 
     }
 
@@ -95,6 +104,11 @@ public class ViewChart extends AppCompatActivity {
 
             File log = Lib.getLogFile(ctx);
             String s = Lib.readFile(log);
+
+            // In case the file is missing / empty
+            if(s == null || s.equals("")){
+                return null;
+            }
 
 
             String[] strList = s.split("\n");
@@ -140,20 +154,45 @@ public class ViewChart extends AppCompatActivity {
                 return null;
             }
 
-            names = new String[updateCountDict.size()];
-            List<BarEntry> blah = new ArrayList<>(updateCountDict.size());
 
-            Iterator it = updateCountDict.entrySet().iterator();
-            int idx = 0;
-            while(it.hasNext()) {
-                Map.Entry entryPair = (Map.Entry) it.next();
-                names[idx] = (String)entryPair.getKey();
-                blah.add(new BarEntry(idx++, (int) entryPair.getValue()));
+            /* This block of code is only necessary to convert the data I have (updateCountDict)
+            into the correct format for the stupid BarChart. */
+
+            // Sort the data by the values.
+            Set<java.util.Map.Entry<String, Integer>> pairsSet = updateCountDict.entrySet();
+            java.util.Map.Entry[] pairs = new java.util.Map.Entry[pairsSet.size()];
+            pairsSet.toArray(pairs);
+            Arrays.sort(pairs, new Comparator<Map.Entry>() {
+                        @Override
+                        public int compare(Map.Entry e1, Map.Entry e2) {
+                            return Integer.compare((int)e1.getValue(), (int)e2.getValue());
+                        }
+                    });
+            // Now have the data sorted in the array "pairs"
+            // Generate the names array and tmp array of values
+            // I need to get the names after sorting so that I have them in order!
+            // Also I translate them from FQDN / package name is "normal" name
+            PackageManager pm = ctx.getPackageManager();
+            List<BarEntry> tmp = new ArrayList<BarEntry>(pairs.length);
+            names = new String[pairs.length];
+            namesLong = new String[pairs.length];
+            for (int i = 0; i < pairs.length; i++){
+                tmp.add(new BarEntry(i, (int) pairs[i].getValue()));
+
+                name = (String) pairs[i].getKey(); // I am re-using this variable from earlier in this method
+                namesLong[i] = name;
+                try { /// translate from ugly "com.android.google.whatever" to nice "YouTube"
+                    ApplicationInfo ai = pm.getApplicationInfo(name, MATCH_UNINSTALLED_PACKAGES);
+                    names[i] = (String)pm.getApplicationLabel(ai);
+                } catch (PackageManager.NameNotFoundException e1){
+                    names[i] = "Unknown Application";
+                }
             }
 
-            BarDataSet bds = new BarDataSet(blah, "Some Data Label");
+            // But the tmp (raw data values) into BarDataSet to set the color
+            BarDataSet bds = new BarDataSet(tmp, "Some Data Label");
             bds.setColor(Color.argb(250, 50, 77, 178));
-            BarData bd = new BarData(bds);
+            BarData bd = new BarData(bds); // for the actual chart
             return bd;
 
         }
@@ -161,6 +200,7 @@ public class ViewChart extends AppCompatActivity {
         @Override
         protected void onPostExecute(BarData barData) {
             if(barData == null){
+                bc.setNoDataText("Log File Empty!  Install / update some apps first.");
                 return;
             }
 
@@ -175,9 +215,14 @@ public class ViewChart extends AppCompatActivity {
             bc.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                 @Override
                 public void onValueSelected(Entry e, Highlight h) {
-                    String n = names[(int)e.getX()];
+                    String n = namesLong[(int)e.getX()];
+
                     TextView tv = (TextView)findViewById(R.id.view_chart_tv_detail);
                     tv.setText(n + "\n" + (int)e.getY() + " updates");
+
+                    n = names[(int)e.getX()];
+                    tv = (TextView) findViewById(R.id.view_chart_tv_main);
+                    tv.setText(n);
                 }
 
                 @Override
