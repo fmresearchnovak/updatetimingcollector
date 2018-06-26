@@ -33,28 +33,6 @@
                 android:layout_gravity="center"/>
         </TableRow>
 
-        <TableRow
-            android:background="#EFEFEF"
-            android:layout_margin="2dp">
-
-            <TextView
-                android:text="Phone"
-                android:textStyle="bold"
-                android:padding="10dip"
-                android:layout_gravity="center_vertical"/>
-
-            <TextView
-                android:text="make and manage phone calls"
-                android:padding="10dip"
-                android:layout_gravity="center_vertical"/>
-            
-            <TextView
-                android:text="Access a unique identifier (IMEI number) for this device"
-                android:padding="10dip"
-                android:layout_width="1dp"
-                android:layout_gravity="center_vertical"/>
-        </TableRow>
-
 
         <TableRow
             android:background="#EFEFEF"

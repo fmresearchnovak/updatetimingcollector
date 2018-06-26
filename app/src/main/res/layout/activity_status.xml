@@ -61,7 +61,7 @@
         android:textColor="#bbbbbb"
         android:textSize="16sp"
         android:layout_marginLeft="20dp"
-        app:layout_constraintLeft_toRightOf="@+id/status_iv_chart"
+        app:layout_constraintLeft_toRightOf="@+id/status_iv_server"
         app:layout_constraintTop_toBottomOf="@id/status_tv_server_ts"/>
 
     <ImageView android:id="@+id/status_iv_bytes"
@@ -93,7 +93,7 @@
         app:layout_constraintTop_toBottomOf="@id/status_tv_bytes_contrib"/>
 
 
-    <ImageView android:id="@+id/status_iv_imei"
+    <ImageView android:id="@+id/status_iv_id"
         android:layout_height="64dp"
         android:layout_width="64dp"
         android:src="@mipmap/i_circle"
@@ -101,24 +101,24 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/status_iv_bytes"/>
 
-    <TextView android:id="@+id/status_tv_imei_contrib"
+    <TextView android:id="@+id/status_tv_id_contrib"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Your IMEI Number:"
+        android:text="Your ID Number:"
         android:textColor="#222222"
         android:textSize="16sp"
         android:layout_margin="20dp"
-        app:layout_constraintLeft_toRightOf="@id/status_iv_imei"
-        app:layout_constraintBottom_toBottomOf="@id/status_iv_imei"/>
+        app:layout_constraintLeft_toRightOf="@id/status_iv_id"
+        app:layout_constraintBottom_toBottomOf="@id/status_iv_id"/>
 
-    <TextView android:id="@+id/status_tv_imei_contrib_val"
+    <TextView android:id="@+id/status_tv_id_contrib_val"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="unknown"
         android:textColor="#bbbbbb"
         android:textSize="16sp"
         android:layout_marginLeft="20dp"
-        app:layout_constraintLeft_toRightOf="@+id/status_iv_imei"
-        app:layout_constraintTop_toBottomOf="@id/status_tv_imei_contrib"/>
+        app:layout_constraintLeft_toRightOf="@+id/status_iv_id"
+        app:layout_constraintTop_toBottomOf="@id/status_tv_id_contrib"/>
 
 </android.support.constraint.ConstraintLayout>

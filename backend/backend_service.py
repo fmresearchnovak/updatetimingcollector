@@ -20,9 +20,8 @@ def checkName(s):
     if ".." in s or "/" in s or "\\" in s:
         return False
 
-    valid_chars = string.digits + "_new.csv"
     for character in s:
-        if character not in valid_chars:
+        if character not in string.digits:
             return False
     return True
 

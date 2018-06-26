@@ -86,7 +86,7 @@ public class LoggingJobSchedulerService extends JobService implements Serializab
                     lastScanResults = loadScanResults();
 
                     // Even the file was blank (probably a fresh install)
-                    if(lastScanResults == null){
+                    if(lastScanResults == null || lastScanResults.equals("")){
                         Log.d(TAG, "File also blank!  Using these scan results");
                         lastScanResults = newScanResults;
                     }

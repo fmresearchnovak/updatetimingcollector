@@ -102,7 +102,7 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
         //   - The uploadTimeWait is only an issue if the user manually uploads rapidly.
         long diff = System.currentTimeMillis() - lastUploadScheduledTS;
         while(diff < uploadWaitTimeMS || !networkConnectivity()) {
-            Log.d(TAG, "Waiting to upload logfile.  Waiting on uploadTimeBuffer or Network Connectivity");
+            Log.d(TAG, "Thread " + Thread.currentThread().getId() + " waiting to upload logfile.  Waiting on uploadTimeBuffer or Network Connectivity");
             try {
 
                 // Wait a random amount of time so that the threads wake up
@@ -142,6 +142,7 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
             uploadNecessary = false;
             //Log.d(TAG, "Thread in BcastReceiver will now upload.  Upload necessary is now: " + uploadNecessary);
 
+            Log.d(TAG, "Thread " + Thread.currentThread().getId() + " attempting to upload...");
             success = postFile();
             if(!success){
                 Log.d(TAG, "UPLOAD FAILED!");
@@ -171,7 +172,7 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
             //Log.d(TAG, "Success uploading to server at: " + dateString);
 
         } else {
-            s = "File Not Uploaded!";
+            s = "File not uploaded.";
         }
         makeToastWithCheck(s);
         Log.d(TAG, s);

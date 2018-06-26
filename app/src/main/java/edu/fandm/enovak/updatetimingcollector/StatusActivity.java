@@ -75,10 +75,9 @@ public class StatusActivity extends AppCompatActivity {
         }
 
         // --- 4 ---
-        // IMEI number
-        String IMEI = Lib.getIMEI(ctx);
-        TextView imeiTV = (TextView) findViewById(R.id.status_tv_imei_contrib_val);
-        imeiTV.setText(IMEI);
+        // ID number
+        String ID = Lib.getID(ctx);
+        ((TextView)findViewById(R.id.status_tv_id_contrib_val)).setText(ID);
     }
 
 

@@ -2,12 +2,14 @@ package edu.fandm.enovak.updatetimingcollector;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +19,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
+
+import static edu.fandm.enovak.updatetimingcollector.Main.TAG;
 
 /**
  * Created by enovak on 3/1/18.
@@ -26,7 +31,9 @@ public class Lib {
 
     public static final String PREF_FILE_NAME = "edu.fandm.enovak.updatetimingcollector.MAIN_PREF_FILE";
     public static final String PREF_SERV_TS_KEY = "edu.fandm.enovak.updatetimingcollector.SERV_TS";
-    public static final String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.INTERNET};
+    public static final String PREF_UUID_KEY = "edu.fandm.enovak.updatetimingcollector.UUID_KEY";
+
+    public static final String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET};
 
 
     public static boolean isExternalStorageWritable() {
@@ -61,39 +68,30 @@ public class Lib {
     }
 
 
-    public static String getIMEI(Context ctx){
+    public static String getID(Context ctx){
 
-        TelephonyManager tManager = (TelephonyManager)ctx.getSystemService(Context.TELEPHONY_SERVICE);
 
-        String ans = "could_not_get_IMEI";
-        try{
-            if(isNewerAndroid()) {
-                ans = tManager.getImei();
-            } else {
-                ans = tManager.getDeviceId();
-            }
-        } catch (SecurityException e1){
+        SharedPreferences sharedPref = ctx.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
+        long uniqueID = sharedPref.getLong(Lib.PREF_UUID_KEY, -1);
 
-        } catch (NullPointerException e2){
+        // Generate a new UUID if necessary, this should only happen on install / reinstall
+        if(uniqueID == -1){
+            // .getMostSignificantBits gives me a purely numeric result
+            uniqueID = Math.abs(UUID.randomUUID().getMostSignificantBits());
 
+            SharedPreferences.Editor e = sharedPref.edit();
+            e.putLong(Lib.PREF_UUID_KEY, uniqueID);
+            e.commit();
         }
 
-        // This accounts for tablets and other devices that
-        // might not have an IMEI (that's only present on SIM-card devices)
-        // This 64-bit number will be reset if the device is factory reset
-
-        // https://medium.com/@ssaurel/how-to-retrieve-an-unique-id-to-identify-android-devices-6f99fd5369eb
-        if (ans.equals("could_not_get_IMEI")){
-            ans = Settings.Secure.getString(ctx.getContentResolver(), Settings.Secure.ANDROID_ID);
-        }
-
-        return ans;
+        //Log.d(TAG, "uniqueID: "+ uniqueID);
+        return String.valueOf(uniqueID);
 
 
     }
 
     public static File getLogFile(Context ctx){
-        String fileName = getIMEI(ctx) + ".csv";
+        String fileName = getID(ctx) + ".csv";
 
         File envDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
         if(!envDir.exists()){

@@ -179,7 +179,14 @@ public class ViewChart extends AppCompatActivity {
             for (int i = 0; i < pairs.length; i++){
                 tmp.add(new BarEntry(i, (int) pairs[i].getValue()));
 
-                name = (String) pairs[i].getKey(); // I am re-using this variable from earlier in this method
+                // Sometimes the package names have a :UID tacked on to the end
+                // e.g., com.google.android.apps.maps:10098   where 10098 is the UID of this app
+                // I don't know why, but we need to remove it for the package manager to find
+                // the package to get the real name (and icon eventually)
+                name = (String) pairs[i].getKey(); // I am re-using this variable from earlier in this method]
+                if(name.contains(":")){
+                    name = name.split(":")[0];
+                }
                 namesLong[i] = name;
                 try { /// translate from ugly "com.android.google.whatever" to nice "YouTube"
                     ApplicationInfo ai = pm.getApplicationInfo(name, MATCH_UNINSTALLED_PACKAGES);
