@@ -3,6 +3,7 @@ package edu.fandm.enovak.updatetimingcollector;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,7 +17,7 @@ import android.widget.Toast;
 
 import java.io.File;
 
-
+import static edu.fandm.enovak.updatetimingcollector.Lib.PREF_FILE_NAME;
 
 
 public class Main extends AppCompatActivity {
@@ -59,6 +60,15 @@ public class Main extends AppCompatActivity {
             tv.setText("Please accept all permissions");
             tv.setTextColor(Color.parseColor("#800000"));
         } else {
+
+            // Upload on first run
+            SharedPreferences sharedPref = ctx.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
+            long ts = sharedPref.getLong(Lib.PREF_SERV_TS_KEY, -1);
+            if(ts == -1) {
+                FilePOSTer.scheduleUpload(ctx, false, 500); // 500ms
+            }
+
+
             tv.setText("That's it!  You're done!");
             tv.setTextColor(Color.parseColor("#111111"));
         }

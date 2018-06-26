@@ -33,7 +33,7 @@ import static edu.fandm.enovak.updatetimingcollector.Main.TAG;
 public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
 
     private final static String SERVER_ADDR = "http://cs-41.fandm.edu:9000";
-    public File f;
+    private File f;
 
     private String attachmentName;
     private String attachmentFileName;
@@ -41,7 +41,6 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
     private final String twoHyphens = "--";
     private final String boundary = "-----";
 
-    private final String contents;
     private Context ctx;
     private boolean toastsOn;
     private boolean networkOn;
@@ -62,13 +61,8 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
         ctx = context;
         toastsOn = withToasts;
         networkOn = false;
-        contents = Lib.readFile(newF);
         uploadWaitTimeMS = 1000;
-
-        if(contents == null){
-            throw new IllegalArgumentException("Unable to read file");
-        }
-
+        f = newF;
         attachmentFileName = newF.getName();
         attachmentName = Lib.SHA256(newF.getName());
     }
@@ -147,6 +141,8 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
             if(!success){
                 Log.d(TAG, "UPLOAD FAILED!");
             }
+        } else {
+            Log.d(TAG, "Thread " + Thread.currentThread().getId() + " abandoned upload.  Another thread seems to have taken care of it.");
         }
 
         return success;
@@ -207,6 +203,10 @@ public class FilePOSTer extends AsyncTask<Void, Void, Boolean> {
 
             // write actual file data!
             requestOS.write(newLine.getBytes());
+            String contents = Lib.readFile(f);
+            if(contents == null){
+                throw new IllegalArgumentException("Unable to read file");
+            }
             requestOS.write(contents.getBytes());
             requestOS.write((twoHyphens + boundary +  twoHyphens + newLine).getBytes());
 
