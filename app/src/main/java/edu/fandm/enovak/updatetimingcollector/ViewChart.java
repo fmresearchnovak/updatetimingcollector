@@ -79,8 +79,6 @@ public class ViewChart extends AppCompatActivity {
         bc.setDrawValueAboveBar(false);
 
 
-        bc.animateY(1500, Easing.EasingOption.EaseOutBack);
-
     }
 
 
@@ -239,8 +237,11 @@ public class ViewChart extends AppCompatActivity {
             });
 
 
-            // re-draw the chart
-            bc.invalidate();
+            // re-draw the chart and animate it!
+            // Important to do the animation here because it happens INSTANTLY
+            // to it should start when the chart is fully ready to be displayed
+            bc.invalidate(); // alters the data on the chart, cause it to be re-rendered
+            bc.animateY(1500, Easing.EasingOption.EaseOutBack); // runs an animation
 
         }
     }
