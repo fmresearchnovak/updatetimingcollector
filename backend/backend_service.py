@@ -7,6 +7,7 @@
 
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn
 import os
 import hashlib
 import string
@@ -53,8 +54,6 @@ def writeFile(fileName, c, codeLetter):
 
 
 class FileHandler(BaseHTTPRequestHandler):
-
-
 
     def do_HEAD(self):
         s = str(time.asctime()) + " HEAD!!  at" + str(self.path) + "\n"
@@ -144,11 +143,13 @@ class FileHandler(BaseHTTPRequestHandler):
         self.respond_ok()
 
 
+class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
+	pass
 
 
 
 if __name__ == '__main__':
-    httpd = HTTPServer((HOST_NAME, PORT_NUMBER), FileHandler)
+    httpd = ThreadingHTTPServer((HOST_NAME, PORT_NUMBER), FileHandler)
     s = str(time.asctime()) +  ' Server Starting - %s:%s' % (HOST_NAME, PORT_NUMBER) + "\n"
     writeFile(LOG_FILE_NAME, s, 'a+')
 
