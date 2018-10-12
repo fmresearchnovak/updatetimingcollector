@@ -149,6 +149,8 @@ class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
 
 
 if __name__ == '__main__':
+
+    os.chdir("/srv/updatetimingcollector/backend/")
     httpd = ThreadingHTTPServer((HOST_NAME, PORT_NUMBER), FileHandler)
     s = str(time.asctime()) +  ' Server Starting - %s:%s' % (HOST_NAME, PORT_NUMBER) + "\n"
     writeFile(LOG_FILE_NAME, s, 'a+')
